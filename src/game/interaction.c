@@ -1685,7 +1685,7 @@ u32 interact_cap(struct MarioState *m, UNUSED u32 interactType, struct Object *o
                 case MARIO_WING_CAP:
                     play_cap_music(SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP));
                     m->flags |= MARIO_WING_CAP;
-                    capTime = 1800;
+                    capTime = 1200;
                     if (capTime > m->capTimer) {
                         m->capTimer = capTime;
                     }

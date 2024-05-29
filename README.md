@@ -1,7 +1,9 @@
-# Mario Builder 64
+# Mario Builder 64 (SynthKitten's Fork)
 Mario Builder 64 is a Super Mario 64 ROM hack that allows you to create custom levels in-game. Mario Builder 64 was built on top of the source code of **SM64: Beyond the Cursed Mirror** and uses the **HackerSM64** repo as a base. Level editor-specific code can be found in `mb64.c` and its counterparts. Some code is unsightly and abominable, so exercise caution to those who view it.
 
 When building from a freshly cloned repo, the baserom extractor will overwrite a lot of assets. To fix this, simply discard all the extra changes that appear in your source control tab.
+
+**SynthKitten's Fork** will be maintained closely to the original, but will feature minor changes to maintain similarity to the original game and be aimed to be the most enjoyable experience for casual players.
 
 # HackerSM64
 

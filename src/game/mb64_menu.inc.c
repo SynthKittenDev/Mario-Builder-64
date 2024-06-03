@@ -178,7 +178,7 @@ void full_menu_reset() {
     mb64_global_scissor_top = 0;
     mb64_global_scissor_bottom = SCREEN_HEIGHT;
     mb64_menu_index = 0;
-    mb64_menu_index_max = 1;
+    mb64_menu_index_max = 256;
     mb64_tip_timer = 0;
     mb64_topleft_timer = 0;
     mb64_konami_code_cur_index = 0;
@@ -279,9 +279,15 @@ s32 mb64_menu_option_sidescroll(s32 x, s32 y, s32 width,
         rightX += xOffset;
     }
 
+    f32 scissorLeft = x-width+5;
+    f32 scissorRight = x+width-7;
+    if (gIsWidescreen) {
+        scissorLeft = scissorLeft * 0.75f + 40.f;
+        scissorRight = scissorRight * 0.75f + 40.f;
+    }
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE,
-        MAX(               mb64_global_scissor, x-width+5), mb64_global_scissor_top,
-        MIN(SCREEN_WIDTH - mb64_global_scissor, x+width-7), mb64_global_scissor_bottom);
+        MAX(               mb64_global_scissor, scissorLeft), mb64_global_scissor_top,
+        MIN(SCREEN_WIDTH - mb64_global_scissor, scissorRight), mb64_global_scissor_bottom);
     
     print_maker_string_ascii_centered(x + xOffset, y, cur, color);
     if (leftX > x - width * 2) {
@@ -923,8 +929,6 @@ void draw_mb64_settings_music(f32 xoff, f32 yoff) {
     }
 }
 
-struct mb64_settings_button mb64_change_size_button = {NULL,  &mb64_newsize, mb64_levelsize_string_table, ARRAY_COUNT(mb64_levelsize_string_table), NULL, NULL};
-
 extern u8 mb64_mm_state; //externing a variable in the same file that it's defined in? more likely than you think. how heinous.
 void draw_mb64_settings_system(f32 xoff, f32 yoff) {
     char strbuf[50];
@@ -1155,7 +1159,7 @@ void draw_mb64_menu(void) {
             gSPDisplayList(gDisplayListHead++, &bigpainting2_bigpainting2_mesh);
             gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
-            mb64_global_scissor = 15;
+            mb64_global_scissor = (gIsWidescreen ? 51 : 15); // widescreen adjust: (x*3/4 + 40)
             mb64_global_scissor_top = MAX(0, 15 - yOff);
             mb64_global_scissor_bottom = MAX(0, 145 - yOff);
             gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, mb64_global_scissor, mb64_global_scissor_top, SCREEN_WIDTH - mb64_global_scissor, mb64_global_scissor_bottom);
@@ -1571,16 +1575,15 @@ void mb64_mm_generic_anim_check(s32 canBack) {
     }
 }
 
-void mb64_mm_no_files_anim_check(UNUSED s32 canBack) {
-    if (mb64_menu_start_timer == -1 || mb64_menu_start_timer > 10) {
-        if (gPlayer1Controller->buttonPressed & (B_BUTTON)) {
-            mb64_menu_end_timer = 0;
-            mb64_menu_going_back = -1;
-            mb64_menu_start_timer = -1;
-            mb64_mm_reset_all_buttons(0.f);
-            play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
+void mb64_mm_files_anim_check(s32 canBack) {
+    if (gPlayer1Controller->buttonPressed & (A_BUTTON)) {
+        if (mb64_level_entry_count == 0) return;
+        if (mb64_level_entry_version[mb64_menu_index] > MB64_VERSION) {
+            play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
+            return;
         }
     }
+    mb64_mm_generic_anim_check(canBack);
 }
 
 void mb64_mm_make_anim_check(UNUSED s32 canBack) {
@@ -1641,8 +1644,8 @@ s32 mb64_mm_generic_anim_out(s32 len, s32 canBack) {
     return mb64_mm_anim_out(len, canBack, mb64_mm_generic_anim_check, 23.f);
 }
 
-s32 mb64_mm_no_files_anim_out(void) {
-    return mb64_mm_anim_out(1, TRUE, mb64_mm_no_files_anim_check, 23.f);
+s32 mb64_mm_files_anim_out(void) {
+    return mb64_mm_anim_out(5, TRUE, mb64_mm_files_anim_check, 23.f);
 }
 
 s32 mb64_mm_keyboard_anim_out(void) {
@@ -2160,7 +2163,7 @@ s32 mb64_main_menu(void) {
                 gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
                 print_maker_string_ascii(55 + mb64_menu_button_vels[0][0],200,"No levels currently loaded yet.",MB64_TEXT_YELLOW);
-                if (mb64_mm_no_files_anim_out()) {
+                if (mb64_mm_files_anim_out()) {
                     mb64_menu_start_timer = 0;
                     if (mb64_menu_going_back == -1) {
                         mb64_mm_state = mb64_mm_files_prev_menu;
@@ -2188,7 +2191,7 @@ s32 mb64_main_menu(void) {
 
             s32 tempindex = mb64_menu_index;
             mb64_menu_index -= mb64_mm_page*PAGE_SIZE; // horrible code to fix animation
-            if (mb64_mm_generic_anim_out(5, TRUE)) {
+            if (mb64_mm_files_anim_out()) {
                 mb64_menu_start_timer = 0;
                 if (mb64_menu_going_back == -1) {
                     mb64_mm_state = mb64_mm_files_prev_menu;
@@ -2252,7 +2255,7 @@ s32 mb64_main_menu(void) {
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
                 gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
-                if (MB64_VERSION < mb64_level_entry_version[i]) {
+                if (MB64_VERSION < mb64_level_entry_version[startRenderIndex + i]) {
                     print_maker_string_ascii(75 + xPosAnim,startRenderY - 10 -(i*36),"Created in future version, update to play.",MB64_TEXT_RED);
                 } else {
                     print_maker_string_ascii(75 + xPosAnim,startRenderY - 10 -(i*36),level_entries_ptr[startRenderIndex + i].fname,(selectedIndex == renderIndex));
@@ -2272,7 +2275,7 @@ s32 mb64_main_menu(void) {
             int_to_str_slash(mb64_mm_page+1, mb64_mm_pages, (u8 *)&mb64_mm_txt_pages[6]);
             print_maker_string(42,12 - mb64_menu_title_vels[0],mb64_mm_txt_pages,FALSE);
 
-            if (mb64_level_entry_version[mb64_menu_index] <= MB64_VERSION && mb64_menu_end_timer == 1 && mb64_menu_going_back == 1) {
+            if (mb64_menu_end_timer == 1 && mb64_menu_going_back == 1) {
                 mb64_mode = MB64_MODE_UNINITIALIZED;
                 reset_play_state();
                 int i = 0;
@@ -2393,25 +2396,18 @@ s32 draw_mb64_pause_menu(void) {
             }
 
             mb64_joystick = joystick_direction();
+            s32 oldindex = mb64_menu_index;
             switch(mb64_joystick) {
                 case 2:
-                    mb64_menu_index++;
-                    mb64_menu_index = (mb64_menu_index + 4) % 4;
-                    if (mb64_menu_index==3&&badge_count==0) {
-                        mb64_menu_index++;
-                    }
-                    play_sound(SOUND_MENU_MESSAGE_NEXT_PAGE, gGlobalSoundSource);
+                    mb64_menu_index = MIN(mb64_menu_index + 1, (badge_count==0 ? 2 : 3));
                     break;
                 case 4:
-                    mb64_menu_index--;
-                    mb64_menu_index = (mb64_menu_index + 4) % 4;
-                    if (mb64_menu_index==3&&badge_count==0) {
-                        mb64_menu_index--;
-                    }
-                    play_sound(SOUND_MENU_MESSAGE_NEXT_PAGE, gGlobalSoundSource);
+                    mb64_menu_index = MAX(mb64_menu_index - 1, 0);
                     break;
             }
-            mb64_menu_index = (mb64_menu_index + 4) % 4;
+            if (oldindex != mb64_menu_index) {
+                play_sound(SOUND_MENU_MESSAGE_NEXT_PAGE, gGlobalSoundSource);
+            }
 
             if (gPlayer1Controller->buttonPressed & (A_BUTTON|B_BUTTON|START_BUTTON)) {
                 switch(mb64_menu_index) {
@@ -2490,6 +2486,9 @@ s32 draw_mb64_pause_menu(void) {
                     nuPiWriteSram(0, &mb64_sram_configuration, ALIGN8(sizeof(mb64_sram_configuration)));
                 }
             } else if (gPlayer1Controller->buttonPressed & (A_BUTTON|START_BUTTON)) {
+                if (gPlayer1Controller->buttonPressed & START_BUTTON) {
+                    mb64_menu_index = RETURN_OPTION_INDEX;
+                }
                 switch(mb64_menu_index) {
                     case RETURN_OPTION_INDEX:
                         mb64_elta = FALSE;

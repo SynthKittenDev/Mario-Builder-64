@@ -1013,6 +1013,7 @@ void setup_game_memory(void) {
  */
 Bool32 gSupportsLibpl = FALSE;
 Bool32 gIsGliden = FALSE;
+Bool32 gIsWidescreen = FALSE;
 
 FATFS fs;
 FRESULT mount_success;
@@ -1087,8 +1088,14 @@ void load_level_files_from_sd_card(void) {
                 // Reached end of directory
                 continue;
             }
-            if (strlen(level_entries_ptr[i].fname) > MAX_FILE_NAME_SIZE - 1) {
+            s32 filenamelen = strlen(level_entries_ptr[i].fname);
+            if (filenamelen > MAX_FILE_NAME_SIZE - 1) {
                 // Too long level name, skip
+                i--;
+                continue;
+            }
+            if ((filenamelen > 5) && (strcmp(level_entries_ptr[i].fname + (filenamelen - 5), ".mb64"))) {
+                // File is not an .mb64 file
                 i--;
                 continue;
             }
@@ -1155,6 +1162,7 @@ void thread5_game_loop(UNUSED void *arg) {
         libpl_create_auto_sd_card(16,255);
         lpl_plugin_info *pluginInfo = libpl_get_graphics_plugin();
         gIsGliden = ((pluginInfo->plugin_id == LPL_GLN64)||(pluginInfo->plugin_id == LPL_OGRE)||(pluginInfo->plugin_id == LPL_GLIDE64));
+        gIsWidescreen = (pluginInfo->capabilities & LPL_WIDESCREEN_VIEWPORT) != 0;
     }
     //init mb64 file structure
     cart_init();

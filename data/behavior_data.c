@@ -5213,7 +5213,7 @@ const BehaviorScript bhvFreeBowlingBall[] = {
 };
 
 const BehaviorScript bhvBowlingBall[] = {
-    BEGIN(OBJ_LIST_GENACTOR),
+    BEGIN(OBJ_LIST_DESTRUCTIVE),
     OR_LONG(oFlags, OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_ACTIVATES_FLOOR_SWITCH),
     BILLBOARD(),
     SET_FLOAT(oDrawingDistance, MB64_DRAWDIST_MEDIUM),
@@ -9551,9 +9551,12 @@ const BehaviorScript bhvMakerUkiki[] = {
 };
 
 void bhv_conveyor_init(void);
+void bhv_conveyor_loop(void);
 const BehaviorScript bhvConveyor[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     CALL_NATIVE(bhv_conveyor_init),
-    BREAK(),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_conveyor_loop),
+    END_LOOP(),
 };

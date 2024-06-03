@@ -81,11 +81,6 @@ enum mb64_directions {
     MB64_DIRECTION_NEG_Z,
 };
 
-#define MB64_GRID_FLAG_OCCUPIED (1 << 7)
-#define MB64_GRID_MASK_ROT   (0x3 << 5)
-#define MB64_GRID_SHIFT_ROT  (5)
-#define MB64_GRID_MASK_TILETYPE  (0x1F)
-
 enum mb64_culling_shapes {
     MB64_FACESHAPE_FULL,
     MB64_FACESHAPE_POLETOP,
@@ -181,7 +176,7 @@ struct mb64_obj {
 };
 
 struct mb64_grid_obj {
-    u16 type:5, mat:4, rot:2, occupied:1, waterlogged:1;
+    u16 type:5, mat:4, rot:2, waterlogged:1;
 };
 
 enum mb64_df_context {
@@ -448,5 +443,14 @@ enum imbue {
     IMBUE_BLUE_SWITCH,
     IMBUE_RED_COIN,
 };
+
+extern s32 mb64_min_coord;
+extern s32 mb64_max_coord;
+#define MB64_BOUNDARY_INNER_FLOOR   (1 << 0) // Has the main floor
+#define MB64_BOUNDARY_OUTER_FLOOR   (1 << 1) // Has the fading outer floor
+#define MB64_BOUNDARY_INNER_WALLS   (1 << 2) // Has the inner walls going up to boundary height - has fading part if death plane
+#define MB64_BOUNDARY_OUTER_WALLS   (1 << 3) // Has fading outer walls extending downwards
+#define MB64_BOUNDARY_CEILING       (1 << 4) // Ceiling above the level
+
 
 #endif

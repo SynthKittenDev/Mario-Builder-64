@@ -1634,7 +1634,12 @@ char *txt_fire_spinner[] = {
 char *txt_conveyor[] = {
     "Thin",
     "Full",
-    "Sloped",
+    "Upwards",
+    "Downwards",
+    "Thin (Toggle)",
+    "Full (Toggle)",
+    "Upwards (Toggle)",
+    "Downwards (Toggle)",
 };
 
 enum {
@@ -1832,7 +1837,7 @@ struct mb64_ui_button_type mb64_ui_buttons[] = {
 /* MB64_BUTTON_RFBOX */    {MB64_PM_OBJ, FALSE, 0, OBJECT_TYPE_RFBOX, NULL},
 /* MB64_BUTTON_SHOWRUN */  {MB64_PM_OBJ, FALSE, 0, OBJECT_TYPE_SHOWRUNNER, NULL},
 /* MB64_BUTTON_POWER */    {MB64_PM_OBJ, TRUE, 2, mb64_power_idlist, "Powerup"},
-/* MB64_BUTTON_CONVEYOR */ {MB64_PM_OBJ, FALSE, 3, OBJECT_TYPE_CONVEYOR, &txt_conveyor},
+/* MB64_BUTTON_CONVEYOR */ {MB64_PM_OBJ, FALSE, 8, OBJECT_TYPE_CONVEYOR, &txt_conveyor},
 };
 
 u8 mb64_toolbar_defaults[9] = {
@@ -2240,12 +2245,6 @@ char *mb64_bg_string_table[] = {
     "Pink Sky",
     "None", // 9 - doesn't generate black chasm
 };
-
-#define MB64_BOUNDARY_INNER_FLOOR   (1 << 0) // Has the main floor
-#define MB64_BOUNDARY_OUTER_FLOOR   (1 << 1) // Has the fading outer floor
-#define MB64_BOUNDARY_INNER_WALLS   (1 << 2) // Has the inner walls going up to boundary height - has fading part if death plane
-#define MB64_BOUNDARY_OUTER_WALLS   (1 << 3) // Has fading outer walls extending downwards
-#define MB64_BOUNDARY_CEILING       (1 << 4) // Ceiling above the level
 
 u8 mb64_boundary_table[] = {
     0, // Void

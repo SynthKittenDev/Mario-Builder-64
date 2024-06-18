@@ -94,7 +94,6 @@ enum mb64_culling_shapes {
 
     MB64_FACESHAPE_TOPTRI,
     MB64_FACESHAPE_TOPHALF,
-    MB64_FACESHAPE_EMPTY,
 
     // & 0x10: Bottom slab priority list
     MB64_FACESHAPE_BOTTOMSLAB_PRI = 0x10,
@@ -113,6 +112,14 @@ enum mb64_culling_shapes {
     // 0x23 empty
     MB64_FACESHAPE_DOWNLOWERGENTLE_1 = MB64_FACESHAPE_TOPSLAB_PRI + 4,
     MB64_FACESHAPE_DOWNLOWERGENTLE_2,
+
+    // & 0x40: Empty faces
+    MB64_FACESHAPE_EMPTY = 0x40,
+    // Rotate UVs for certain textures
+    MB64_FACESHAPE_EMPTY_0,
+    MB64_FACESHAPE_EMPTY_1,
+    MB64_FACESHAPE_EMPTY_2,
+    MB64_FACESHAPE_EMPTY_3,
 };
 
 enum mb64_growth_types {
@@ -123,7 +130,6 @@ enum mb64_growth_types {
     MB64_GROWTH_UNDERSLOPE_CORNER, // special check
     MB64_GROWTH_DIAGONAL_SIDE,
     MB64_GROWTH_VSLAB_SIDE, // vertical slabs - middle face
-    MB64_GROWTH_DLGENTLE_UNDER, // special check
     MB64_GROWTH_UNCONDITIONAL,
 
     // Anything beyond this is a slope decal type
@@ -192,15 +198,21 @@ typedef void (*DisplayFunc)(s32);
 #define OBJ_TYPE_HAS_DIALOG     (1 << 3)
 #define OBJ_TYPE_IMBUABLE       (1 << 4)
 #define OBJ_TYPE_IMBUABLE_COINS (1 << 5)
+
+#define OBJ_OCCUPY_OUTER        (1 << 0)
+#define OBJ_OCCUPY_INNER        (1 << 1)
+
+#define OBJ_OCCUPY_FULL        (OBJ_OCCUPY_OUTER | OBJ_OCCUPY_INNER)
 struct mb64_object_info {
     char *name;
     Gfx *btn;
     const BehaviorScript *behavior;
     f32 y_offset;
     u16 model_id;
-    u16 flags:6;
-    u16 numCoins:4;
-    u16 numExtraObjects:3;
+    u8 flags;
+    u8 occupy;
+    u8 numCoins;
+    u8 numExtraObjects;
     f32 scale;
     const struct Animation *const *anim;
     DisplayFunc disp_func;
@@ -276,6 +288,7 @@ enum mb64_mat_types {
 struct mb64_material {
     Gfx *gfx;
     u8 type;
+    u8 vertical;
     TerrainData col;
     char *name; // Only used for Custom Theme menu
 };
@@ -436,12 +449,18 @@ enum imbue {
     IMBUE_NONE,
     IMBUE_STAR,
     IMBUE_THREE_COINS,
-    IMBUE_FIVE_COINS,
+    IMBUE_ONE_COIN,
     IMBUE_EIGHT_COINS,
     IMBUE_BLUE_COIN,
     IMBUE_RED_SWITCH,
     IMBUE_BLUE_SWITCH,
     IMBUE_RED_COIN,
+};
+
+struct imbue_model {
+    s16 model;
+    u8 billboarded;
+    f32 scale;
 };
 
 extern s32 mb64_min_coord;

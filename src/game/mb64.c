@@ -101,6 +101,7 @@ u16 mb64_tile_count = 0;
 u16 mb64_object_count = 0;
 u16 mb64_object_limit_count = 0; // Tracks additional objects like in coin formations, flame spinners
 u16 mb64_building_collision = FALSE; // 0 = building gfx, 1 = building collision
+u16 mb64_total_coin_count = 0;
 
 struct Object *mb64_boundary_object[6]; //one for each side
 
@@ -118,6 +119,7 @@ u16 mb64_gfx_index;
 u8 mb64_use_alt_uvs = FALSE; // Used for decals and special tile shapes
 s8 mb64_uv_offset = -16;
 u8 mb64_render_flip_normals = FALSE; // Used for drawing water tiles
+u8 mb64_render_vertical = FALSE; // Used for prioritizing vertical UVs over horizontal ones
 u8 mb64_render_culling_off = FALSE; // Used for drawing preview blocks in custom theme menu
 u8 mb64_growth_render_type = 0;
 u8 mb64_curr_mat_has_topside = FALSE;
@@ -324,32 +326,6 @@ s32 object_sanity_check(void) {
         }
     }
 
-    if (mb64_id_selection == OBJECT_TYPE_SHOWRUNNER) {
-        s32 numRunners = 0;
-        for (u32 i = 0; i < mb64_object_count; i++) {
-            if (mb64_object_data[i].type == OBJECT_TYPE_SHOWRUNNER) {
-                numRunners++;
-            }
-            if (numRunners >= 3) {
-                mb64_show_error_message("Showrunner limit reached! (max 3)");
-                return FALSE;
-            }
-        }
-    }
-
-    if (mb64_id_selection == OBJECT_TYPE_PHANTASM) {
-        s32 num = 0;
-        for (u32 i = 0; i < mb64_object_count; i++) {
-            if (mb64_object_data[i].type == OBJECT_TYPE_PHANTASM) {
-                num++;
-            }
-            if (num >= 12) {
-                mb64_show_error_message("Cosmic Phantasm limit reached! (max 12)");
-                return FALSE;
-            }
-        }
-    }
-
     return TRUE;
 }
 
@@ -423,17 +399,50 @@ u32 get_faceshape(s8 pos[3], u32 dir) {
     return MB64_FACESHAPE_EMPTY;
 }
 
-u32 tile_is_occupied(s8 pos[3]) {
+u32 get_tile_occupy_flags(u32 type) {
+    if (type == TILE_TYPE_POLE) return OBJ_OCCUPY_INNER;
+    if (type == TILE_TYPE_FENCE) return OBJ_OCCUPY_OUTER;
+    if (type == TILE_TYPE_CULL) return 0;
+    return OBJ_OCCUPY_FULL;
+}
+
+u32 can_place(s8 pos[3], u32 occupyFlags) {
+    // Tile Check
     u32 type = get_grid_tile(pos)->type;
-    if (type != TILE_TYPE_EMPTY && type != TILE_TYPE_WATER) return TRUE;
-    // iterate over objects
+    if (type != TILE_TYPE_EMPTY && type != TILE_TYPE_WATER) {
+        u32 tileFlags = get_tile_occupy_flags(type);
+        if (tileFlags & occupyFlags) return FALSE;
+    }
+    // Object Check
     for (u32 i = 0; i < mb64_object_count; i++) {
         struct mb64_obj *obj = &mb64_object_data[i];
         if (obj->x == pos[0] && obj->y == pos[1] && obj->z == pos[2]) {
-            return TRUE;
+            u32 objFlags = mb64_object_type_list[obj->type].occupy;
+            if (obj->type == OBJECT_TYPE_COIN_FORMATION) { // ring override
+                if (obj->bparam == 2) objFlags = OBJ_OCCUPY_OUTER;
+            }
+            
+            if (objFlags & occupyFlags) return FALSE;
         }
     }
-    return FALSE;
+    return TRUE;
+}
+
+u32 can_place_tile(s8 pos[3]) {
+    // Tiles can never stack, even if one is outer and one is inner
+    u32 type = get_grid_tile(pos)->type;
+    if (type != TILE_TYPE_EMPTY && type != TILE_TYPE_WATER) return FALSE;
+
+    u32 flags = get_tile_occupy_flags(mb64_id_selection);
+    return can_place(pos, flags);
+}
+
+u32 can_place_object(s8 pos[3]) {
+    u32 flags = mb64_object_type_list[mb64_id_selection].occupy;
+    if (mb64_id_selection == OBJECT_TYPE_COIN_FORMATION) {
+        if (mb64_param_selection == 2) flags = OBJ_OCCUPY_OUTER;
+    }
+    return can_place(pos, flags);
 }
 
 s8 cullOffsetLUT[6][3] = {
@@ -505,7 +514,7 @@ u32 block_side_is_solid(s32 adjMat, s32 mat, s32 direction) {
 }
 
 s32 should_cull(s8 pos[3], s32 direction, s32 faceshape, s32 rot) {
-    if (faceshape == MB64_FACESHAPE_EMPTY) return FALSE;
+    if (faceshape & MB64_FACESHAPE_EMPTY) return FALSE;
     if (mb64_render_culling_off) return FALSE;
     direction = rotate_direction(direction, rot);
 
@@ -534,7 +543,7 @@ s32 should_cull(s8 pos[3], s32 direction, s32 faceshape, s32 rot) {
     if (cutout_skip_culling_check(get_grid_tile(pos)->mat, adjTile->mat, direction)) return FALSE;
     s32 otherFaceshape = get_faceshape(adjPos, direction);
 
-    if (otherFaceshape == MB64_FACESHAPE_EMPTY) return FALSE;
+    if (otherFaceshape & MB64_FACESHAPE_EMPTY) return FALSE;
     if (otherFaceshape == MB64_FACESHAPE_FULL) return TRUE;
     if (faceshape == MB64_FACESHAPE_FULL) return FALSE;
     if ((faceshape == MB64_FACESHAPE_TOPTRI) || (faceshape == MB64_FACESHAPE_TOPHALF)) {
@@ -727,7 +736,7 @@ s32 render_get_normal_and_uvs(s8 v[3][3], u32 direction, u32 rot, u8 *uAxis, u8 
     switch (direction) {
         case MB64_DIRECTION_NEG_X: *uAxis = 2; *vAxis = 1; return TRUE;
         case MB64_DIRECTION_POS_X: *uAxis = 2; *vAxis = 1; return FALSE;
-        case MB64_DIRECTION_DOWN: *uAxis = 2; *vAxis = 0; return FALSE;
+        case MB64_DIRECTION_DOWN: // fallthrough
         case MB64_DIRECTION_UP: *uAxis = 2; *vAxis = 0; return FALSE;
         case MB64_DIRECTION_NEG_Z: *uAxis = 0; *vAxis = 1; return FALSE;
         /*case MB64_DIRECTION_POS_Z:*/ default: *uAxis = 0; *vAxis = 1; return TRUE;
@@ -740,11 +749,20 @@ void render_poly(struct mb64_terrain_poly *poly, s8 pos[3], u32 rot) {
 
     s8 newVtx[4][3];
     mb64_transform_vtx_with_rot(newVtx, poly->vtx, rot);
-    s32 flipU = render_get_normal_and_uvs(newVtx, poly->faceDir, rot, &uAxis, &vAxis, n);
+    s32 facedir = poly->faceDir;
+    s32 useAltUVs = mb64_use_alt_uvs;
+    if (mb64_render_vertical && (poly->faceshape > MB64_FACESHAPE_EMPTY)) {
+        facedir = (poly->faceshape - MB64_FACESHAPE_EMPTY) + 1;
+        // The four fixed UV shapes are 0x41 through 0x44
+        // This maps them to 2 through 5 (the four lateral directions)
+        // 0x40 is mapped to Down which results in no rotation
+        useAltUVs = TRUE; // should not coincide with a decal UV
+    }
+    s32 flipU = render_get_normal_and_uvs(newVtx, facedir, rot, &uAxis, &vAxis, n);
 
     for (u32 i = 0; i < mb64_curr_poly_vert_count; i++) {
         s16 u, v;
-        if (mb64_use_alt_uvs && poly->altuvs) {
+        if (useAltUVs && poly->altuvs) {
             u = 16 - (*poly->altuvs)[i][0];
             v = 16 - (*poly->altuvs)[i][1];
         } else {
@@ -932,7 +950,7 @@ u32 should_render_grass_side(s8 pos[3], u32 direction, u32 faceshape, u32 rot, u
     if (AT_CEILING(pos[1])) return FALSE;
     if (!coords_in_range(abovePos)) return TRUE;
 
-    if (faceshape != MB64_FACESHAPE_EMPTY) {
+    if (!(faceshape & MB64_FACESHAPE_EMPTY)) {
         if ((grassType == MB64_GROWTH_HALF_SIDE) || (grassType == MB64_GROWTH_NORMAL_SIDE)) {
             if (should_cull_topslab_check(pos, rotate_direction(direction, rot))) return FALSE;
         }
@@ -943,10 +961,12 @@ u32 should_render_grass_side(s8 pos[3], u32 direction, u32 faceshape, u32 rot, u
     // Render if above tile is seethrough (some exceptions)
     if (cutout_skip_culling_check(tile->mat, aboveTile->mat, MB64_DIRECTION_UP)) return TRUE;
 
+    if (faceshape > MB64_FACESHAPE_EMPTY) {
+        direction = (faceshape - MB64_FACESHAPE_EMPTY) + 1;
+    }
+
     s32 otherFaceshape;
     switch (grassType) {
-        case MB64_GROWTH_DLGENTLE_UNDER:
-            direction = MB64_DIRECTION_POS_Z;
         case MB64_GROWTH_NORMAL_SIDE:
         case MB64_GROWTH_HALF_SIDE:
             // Shape of face of above block on same side
@@ -1338,6 +1358,7 @@ void process_tiles(u32 processTileRenderMode) {
             display_cached_tris();
         }
         mb64_use_alt_uvs = FALSE;
+        mb64_render_vertical = FALSE;
     }
 
     for (u32 mat = 0; mat < NUM_MATERIALS_PER_THEME; mat++) {
@@ -1355,6 +1376,7 @@ void process_tiles(u32 processTileRenderMode) {
 
             set_render_mode( matType, FALSE);
             gSPDisplayList(&mb64_curr_gfx[mb64_gfx_index++], MATERIAL(mat).gfx);
+            mb64_render_vertical = MATERIAL(mat).vertical;
 
             // Important to not use matType here so that it's still opaque for screens
             if ((matType == MAT_CUTOUT) || ((MATERIAL(mat).type < MAT_CUTOUT) && (TOPMAT(mat).type >= MAT_CUTOUT))) {
@@ -1374,8 +1396,8 @@ void process_tiles(u32 processTileRenderMode) {
             process_tile(pos, mb64_terrain_info_list[tileType].terrain, rot);
         }
 
-        PROC_RENDER( display_cached_tris(); \
-                     skip_maintex: )
+        PROC_RENDER( display_cached_tris(); )
+skip_maintex:
         
         if (mb64_curr_mat_has_topside) {
             u8 topmatType = TOPMAT(mat).type;
@@ -1384,6 +1406,7 @@ void process_tiles(u32 processTileRenderMode) {
             // Only runs when rendering
             if (!mb64_building_collision && (sidetex)) {
                 mb64_use_alt_uvs = TRUE;
+                mb64_render_vertical = TRUE;
                 gSPDisplayList(&mb64_curr_gfx[mb64_gfx_index++], sidetex);
                 mb64_growth_render_type = 2;
 
@@ -1421,7 +1444,8 @@ void process_tiles(u32 processTileRenderMode) {
 
             PROC_COLLISION( mb64_curr_coltype = TOPMAT(mat).col; )
             PROC_RENDER( set_render_mode( topmatType, FALSE); \
-                         gSPDisplayList(&mb64_curr_gfx[mb64_gfx_index++], TOPMAT(mat).gfx); )
+                         gSPDisplayList(&mb64_curr_gfx[mb64_gfx_index++], TOPMAT(mat).gfx); \
+                         mb64_render_vertical = TOPMAT(mat).vertical;)
 
             mb64_growth_render_type = 1;
             for (u32 i = startIndex; i < endIndex; i++) {
@@ -1682,6 +1706,7 @@ void generate_terrain_gfx(void) {
 
     mb64_use_alt_uvs = FALSE;
     mb64_render_flip_normals = FALSE;
+    mb64_render_vertical = FALSE;
     mb64_curr_mat_has_topside = FALSE;
     mb64_growth_render_type = 0;
     mb64_uv_offset = (mb64_lopt_theme == MB64_THEME_MC ? -32 : -16);
@@ -1849,6 +1874,7 @@ void render_preview_block(u32 matid, u32 topmatid, s8 pos[3], struct mb64_terrai
     if (do_process(&matType, processType)) {
         set_render_mode( matType, disableZ);
         gSPDisplayList(&mb64_curr_gfx[mb64_gfx_index++], mb64_mat_table[matid].gfx);
+        mb64_render_vertical = mb64_mat_table[matid].vertical;
         // Important to not use matType here so that it's still opaque for screens
         if (((matType == MAT_CUTOUT) ||
             ((mb64_mat_table[matid].type < MAT_CUTOUT) && (mb64_mat_table[topmatid].type >= MAT_CUTOUT)))
@@ -1865,6 +1891,7 @@ void render_preview_block(u32 matid, u32 topmatid, s8 pos[3], struct mb64_terrai
         Gfx *sidetex = get_sidetex(topmatid);
         if (sidetex != NULL) {
             mb64_use_alt_uvs = TRUE;
+            mb64_render_vertical = TRUE;
             mb64_growth_render_type = 2;
             gSPDisplayList(&mb64_curr_gfx[mb64_gfx_index++], sidetex);
 
@@ -1887,6 +1914,7 @@ void render_preview_block(u32 matid, u32 topmatid, s8 pos[3], struct mb64_terrai
 
         set_render_mode( topMatType, disableZ);
         gSPDisplayList(&mb64_curr_gfx[mb64_gfx_index++], mb64_mat_table[topmatid].gfx);
+        mb64_render_vertical = mb64_mat_table[topmatid].vertical;
         process_tile(pos, terrain, rot);
         display_cached_tris();
     }
@@ -2186,6 +2214,9 @@ s32 mb64_get_water_level(s32 x, s32 y, s32 z) {
     if (pos[1] > 63) {
         pos[1] = 63;
     }
+    if (y < -32*TILE_SIZE) {
+        return waterPlaneHeight;
+    }
     if (!coords_in_range(pos)) return waterPlaneHeight;
     // If block contains water, scan upwards, otherwise scan downwards
     if (get_grid_tile(pos)->waterlogged) {
@@ -2208,10 +2239,13 @@ s32 mb64_get_water_level(s32 x, s32 y, s32 z) {
         }
     }
 
+    s32 waterBlockHeight;
     if (is_water_fullblock(pos)) {
-        return (pos[1] - 31) * TILE_SIZE;
+        waterBlockHeight = (pos[1] - 31) * TILE_SIZE;
+    } else {
+        waterBlockHeight = (pos[1] - 31) * TILE_SIZE - (TILE_SIZE / 8);
     }
-    return (pos[1] - 31) * TILE_SIZE - (TILE_SIZE / 8);
+    return MAX(waterBlockHeight, waterPlaneHeight);
 }
 
 struct Object *spawn_preview_object(s8 pos[3], s32 rot, s32 param, struct mb64_object_info *info, const BehaviorScript *script) {
@@ -2243,6 +2277,7 @@ struct Object *spawn_preview_object(s8 pos[3], s32 rot, s32 param, struct mb64_o
 
 void generate_object_preview(void) {
     s32 totalCoins = 0;
+    s32 curExtraCoins = 0;
     s32 doubleCoins = FALSE;
     mb64_object_limit_count = 0;
     struct Object *preview_object = cur_obj_nearest_object_with_behavior(bhvPreviewObject);
@@ -2253,30 +2288,36 @@ void generate_object_preview(void) {
 
     for(u32 i = 0; i < mb64_object_count; i++){
         if (gFreeObjectList.next == NULL) break;
-        struct mb64_object_info *info = &mb64_object_type_list[mb64_object_data[i].type];
+        s32 curType = mb64_object_data[i].type;
+        struct mb64_object_info *info = &mb64_object_type_list[curType];
         s32 param = mb64_object_data[i].bparam;
 
         s8 pos[3];
         vec3_set(pos, mb64_object_data[i].x, mb64_object_data[i].y, mb64_object_data[i].z);
+        curExtraCoins = 0;
 
         spawn_preview_object(pos, mb64_object_data[i].rot, param, info, bhvPreviewObject);
-        totalCoins += info->numCoins;
-        if (mb64_object_data[i].type == OBJECT_TYPE_EXCL_BOX) {
-            totalCoins += mb64_exclamation_box_contents[param].numCoins;
+        curExtraCoins += info->numCoins;
+        if (curType == OBJECT_TYPE_EXCL_BOX) {
+            curExtraCoins += mb64_exclamation_box_contents[param].numCoins;
         }
-        if (mb64_object_data[i].type == OBJECT_TYPE_BADGE && param == 8) { // Greed badge
+        if (curType == OBJECT_TYPE_BADGE && param == 8) { // Greed badge
             doubleCoins = TRUE;
         }
 
-        s32 extraObjs = get_extra_objects(mb64_object_data[i].type, param);
-        if (mb64_object_data[i].type == OBJECT_TYPE_COIN_FORMATION) {
-            totalCoins += extraObjs;
+        s32 extraObjs = get_extra_objects(curType, param);
+        if (curType == OBJECT_TYPE_COIN_FORMATION) {
+            curExtraCoins += extraObjs;
         }
 
-        if ((mb64_object_data[i].imbue != IMBUE_NONE)&&(!mb64_prepare_level_screenshot)) {
+        s32 curImbue = mb64_object_data[i].imbue;
+        if ((curImbue != IMBUE_NONE)&&(!mb64_prepare_level_screenshot)) {
             u16 imbue_marker_model = MODEL_MAKER_IMBUE;
-            if (mb64_object_data[i].imbue == IMBUE_STAR) {
+            if (curImbue == IMBUE_STAR) {
                 imbue_marker_model = MODEL_MAKER_IMBUE_STAR;
+            } else if ((curImbue >= IMBUE_THREE_COINS && curImbue <= IMBUE_BLUE_COIN) ||
+                        (curImbue == IMBUE_RED_COIN)) {
+                imbue_marker_model = MODEL_MAKER_IMBUE_COIN;
             }
             struct Object * imbue_marker = spawn_object(o,imbue_marker_model,bhvPreviewObject);
             imbue_marker->header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD;
@@ -2284,10 +2325,14 @@ void generate_object_preview(void) {
             imbue_marker->oPosY = GRID_TO_POS(pos[1]);
             imbue_marker->oPosZ = GRID_TO_POS(pos[2]);
             mb64_object_limit_count ++;
-            totalCoins += imbue_coin_amounts[mb64_object_data[i].imbue];
+            curExtraCoins = imbue_coin_amounts[curImbue]; // replaces coin count
+            if (curType == OBJECT_TYPE_SHOWRUNNER) {
+                curExtraCoins += info->numCoins; // showrunner always drops coins
+            }
         }
 
         mb64_object_limit_count += extraObjs + 1;
+        totalCoins += curExtraCoins;
     }
     if (doubleCoins) totalCoins *= 2;
 
@@ -2301,6 +2346,7 @@ void generate_object_preview(void) {
     if (mb64_lopt_coinstar > length) {
         mb64_lopt_coinstar = length;
     }
+    mb64_total_coin_count = totalCoins;
 
     generate_trajectory_gfx();
 }
@@ -2587,47 +2633,60 @@ u8 joystick_direction(void) {
 }
 
 void imbue_action(void) {
-    if (mb64_place_mode == MB64_PM_OBJ) {
-        for (u32 i=0;i<mb64_object_count;i++) {
-            if ((mb64_object_type_list[mb64_object_data[i].type].flags & OBJ_TYPE_IMBUABLE)&&(mb64_object_data[i].x == mb64_cursor_pos[0])&&(mb64_object_data[i].y == mb64_cursor_pos[1])&&(mb64_object_data[i].z == mb64_cursor_pos[2])&&(mb64_object_data[i].imbue == IMBUE_NONE)) {
-                u8 imbue_success = FALSE;
+    for (u32 i=0;i<mb64_object_count;i++) {
+        s32 objType = mb64_object_data[i].type;
+        if ((mb64_object_type_list[objType].flags & OBJ_TYPE_IMBUABLE)&&(mb64_object_data[i].x == mb64_cursor_pos[0])&&(mb64_object_data[i].y == mb64_cursor_pos[1])&&(mb64_object_data[i].z == mb64_cursor_pos[2])) {
+            u8 imbue_success = FALSE;
+            u8 oldImbue = mb64_object_data[i].imbue;
 
-                switch(mb64_id_selection) {
-                    case OBJECT_TYPE_STAR:
-                        mb64_object_data[i].imbue = IMBUE_STAR;
+            switch(mb64_id_selection) {
+                case OBJECT_TYPE_STAR:
+                    s32 numStars = mb64_count_stars();
+                    if (numStars >= 63) {
+                        mb64_show_error_message("Star limit reached! (max 63)");
+                        imbue_success = FALSE;
+                        break;
+                    }
+                    mb64_object_data[i].imbue = IMBUE_STAR;
+                    imbue_success = TRUE;
+                    break;
+                case OBJECT_TYPE_BLUE_COIN:
+                    if (mb64_object_type_list[objType].flags & OBJ_TYPE_IMBUABLE_COINS) {
+                        mb64_object_data[i].imbue = IMBUE_BLUE_COIN;
                         imbue_success = TRUE;
-                        break;
-                    case OBJECT_TYPE_BLUE_COIN:
-                        if (mb64_object_type_list[mb64_object_data[i].type].flags & OBJ_TYPE_IMBUABLE_COINS) {
-                            mb64_object_data[i].imbue = IMBUE_BLUE_COIN;
-                            imbue_success = TRUE;
-                        }
-                        break;
-                    case OBJECT_TYPE_COIN:
-                        if (mb64_object_type_list[mb64_object_data[i].type].flags & OBJ_TYPE_IMBUABLE_COINS) {
+                    }
+                    break;
+                case OBJECT_TYPE_COIN:
+                case OBJECT_TYPE_COIN_FORMATION:
+                    if (mb64_object_type_list[objType].flags & OBJ_TYPE_IMBUABLE_COINS) {
+                        if ((objType == OBJECT_TYPE_BBOX_NORMAL) ||
+                            (objType == OBJECT_TYPE_RFBOX) ||
+                            (objType == OBJECT_TYPE_MONEYBAG)) {
                             mb64_object_data[i].imbue = IMBUE_THREE_COINS;
-                            imbue_success = TRUE;
-                        }
-                        break;
-                    case OBJECT_TYPE_RED_COIN:
-                        mb64_object_data[i].imbue = IMBUE_RED_COIN;
-                        imbue_success = TRUE;
-                        break;
-                    case OBJECT_TYPE_BUTTON:
-                        mb64_object_data[i].imbue = IMBUE_RED_SWITCH;
-                        if (mb64_param_selection == 1) {
-                            mb64_object_data[i].imbue = IMBUE_BLUE_SWITCH;
+                        } else {
+                            mb64_object_data[i].imbue = IMBUE_ONE_COIN;
                         }
                         imbue_success = TRUE;
-                        break;
-                }
-
-                if (imbue_success) {
-                    play_place_sound(SOUND_GENERAL_DOOR_INSERT_KEY | SOUND_VIBRATO);
-                    generate_object_preview();
-                }
-                break;
+                    }
+                    break;
+                case OBJECT_TYPE_RED_COIN:
+                    mb64_object_data[i].imbue = IMBUE_RED_COIN;
+                    imbue_success = TRUE;
+                    break;
+                case OBJECT_TYPE_BUTTON:
+                    mb64_object_data[i].imbue = IMBUE_RED_SWITCH;
+                    if (mb64_param_selection == 1) {
+                        mb64_object_data[i].imbue = IMBUE_BLUE_SWITCH;
+                    }
+                    imbue_success = TRUE;
+                    break;
             }
+
+            if (imbue_success && (oldImbue != mb64_object_data[i].imbue)) {
+                play_place_sound(mb64_object_type_list[mb64_id_selection].soundBits);
+                generate_object_preview();
+            }
+            break;
         }
     }
 }
@@ -2640,23 +2699,23 @@ void place_thing_action(void) {
         }
         return;
     }
-    //tiles and objects share occupancy data
-    if (!tile_is_occupied(mb64_cursor_pos)) {
-        if (mb64_place_mode == MB64_PM_TILE) {
-            //MB64_PM_TILE
-            if (tile_sanity_check()) {
-                place_tile(mb64_cursor_pos);
-                generate_terrain_gfx();
-            }
-        } else if (mb64_place_mode == MB64_PM_OBJ){
-            //MB64_PM_OBJECT
+
+    if (mb64_place_mode == MB64_PM_TILE) {
+        //MB64_PM_TILE
+        if (can_place_tile(mb64_cursor_pos) && tile_sanity_check()) {
+            place_tile(mb64_cursor_pos);
+            generate_terrain_gfx();
+        }
+    } else if (mb64_place_mode == MB64_PM_OBJ){
+        //MB64_PM_OBJECT
+        if (can_place_object(mb64_cursor_pos)) {
             if (object_sanity_check()) {
                 place_object(mb64_cursor_pos);
                 generate_object_preview();
             }
+        } else {
+            imbue_action();
         }
-    } else {
-        imbue_action();
     }
 }
 
@@ -2720,8 +2779,8 @@ void delete_tile_action(s8 pos[3]) {
                 break;
             }
             delete_object(pos, i);
+            i--;
             play_place_sound(SOUND_GENERAL_DOOR_INSERT_KEY | SOUND_VIBRATO);
-            break;
         }
     }
 }
@@ -2817,6 +2876,7 @@ void save_level(void) {
 
         if (screenshot_failure) {
             //framebuffer emulation not enabled, use ?
+            mb64_show_error_message("Screenshot failed.\nMake sure framebuffer emulation (FBE) is enabled.");
             bcopy(&mystery_painting_rgba16,&mb64_save.piktcher,sizeof(mb64_save.piktcher));
         }
 
@@ -3540,7 +3600,7 @@ void sb_loop(void) {
                             }
                         }
 
-                        if (tile_is_occupied(mb64_cursor_pos) && !at_spawn_point) {
+                        if (!can_place(mb64_cursor_pos, OBJ_OCCUPY_INNER) && !at_spawn_point) {
                             mb64_show_error_message("Cannot start test inside another tile or object!");
                             break;
                         }

@@ -773,6 +773,8 @@
 /* Moneybag */
 #define /*0x0F4*/ oMoneybagJumpState OBJECT_FIELD_S32(0x1B)
 
+#define /*0x0F4*/ oMoneybagHiddenScale OBJECT_FIELD_F32(0x1B)
+
 /* Monty Mole */
 #define /*0x0F4*/ oMontyMoleCurrentHole           OBJECT_FIELD_OBJ(0x1B)
 #define /*0x0F8*/ oMontyMoleHeightRelativeToFloor OBJECT_FIELD_F32(0x1C)
@@ -932,6 +934,7 @@
 #define /*0x0F4*/ oScuttlebugHasNoLootCoins OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oScuttlebugIsAtttacking   OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oScuttlebugTimer          OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ oScuttlebugTargetAngle    OBJECT_FIELD_S16(0x1E, 0)
 
 /* Scuttlebug Spawner */
 #define /*0x088*/ oScuttlebugSpawnerIsDeactivated        OBJECT_FIELD_S32(0x00)
@@ -981,11 +984,12 @@
 /* Snufit */
 #define /*0x0F4*/ oSnufitRecoil          OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oSnufitScale           OBJECT_FIELD_F32(0x1C)
-// 0x1D
-#define /*0x100*/ oSnufitCircularPeriod  OBJECT_FIELD_S32(0x1E)
-#define /*0x104*/ oSnufitBodyScalePeriod OBJECT_FIELD_S32(0x1F)
-#define /*0x108*/ oSnufitBodyBaseScale   OBJECT_FIELD_S32(0x20)
-#define /*0x10C*/ oSnufitBullets         OBJECT_FIELD_S32(0x21)
+#define /*0x0FC*/ oSnufitCircularPeriod  OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ oSnufitBodyScalePeriod OBJECT_FIELD_S32(0x1E)
+#define /*0x104*/ oSnufitBodyBaseScale   OBJECT_FIELD_S32(0x1F)
+#define /*0x108*/ oSnufitBullets         OBJECT_FIELD_S32(0x20)
+#define /*0x10C*/ oSnufitCenterX         OBJECT_FIELD_F32(0x21)
+#define /*0x110*/ oSnufitCenterZ         OBJECT_FIELD_F32(0x22)
 #define /*0x1AC*/ oSnufitBodyScale       OBJECT_FIELD_S16(0x49, 0)
 
 /* Spindel */
@@ -1241,6 +1245,8 @@
 
 /* Whomp */
 #define /*0x0F8*/ oWhompShakeVal OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oWhompHomeX    OBJECT_FIELD_F32(0x1D)
+#define /*0x100*/ oWhompHomeZ    OBJECT_FIELD_F32(0x1E)
 
 /* Wiggler */
 #define /*0x0F4*/ oWigglerFallThroughFloorsHeight OBJECT_FIELD_F32(0x1B)
@@ -1271,6 +1277,15 @@
 /* Wooden Platform */
 #define /*0x0F4*/ oWoodPlatAbovePlatform OBJECT_FIELD_OBJ(0x1C)
 #define /*0x0F8*/ oWoodPlatIsStacked     OBJECT_FIELD_S32(0x1D)
+
+/* Showrunner */
+#define /*0x0F4*/ oShowrunnerSpikeAttacksLeft OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oShowrunnerSpikeClose       OBJECT_FIELD_S16(0x1C, 0)
+#define /*0x0FA*/ oShowrunnerSpikeLockedAngle OBJECT_FIELD_S16(0x1C, 1)
+#define /*0x0FC*/ oShowrunnerTennisBool       OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ oShowrunnerSpikeX           OBJECT_FIELD_F32(0x1E)
+#define /*0x104*/ oShowrunnerSpikeY           OBJECT_FIELD_F32(0x1F)
+#define /*0x108*/ oShowrunnerSpikeZ           OBJECT_FIELD_F32(0x20)
 
 /*Custom general defines:
 

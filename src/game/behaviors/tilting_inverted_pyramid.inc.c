@@ -6152,6 +6152,13 @@ void bhv_onoffswitch(void) {
         case 0: // init
             o->oAnimState = o->oBehParams2ndByte;
             o->oAction = 1;
+            if ((o->oAnimState == 0) && (!mb64_play_onoff)) {
+                o->header.gfx.scale[1] = 0.1f;
+                o->oAction = 2;
+            } else if ((o->oAnimState != 0) && (mb64_play_onoff)) {
+                o->header.gfx.scale[1] = 0.1f;
+                o->oAction = 2;
+            }
             break;
         case 1: // switch up
             o->header.gfx.scale[1] = approach_f32_symmetric(o->header.gfx.scale[1], 1.0f ,0.1f);
@@ -6159,14 +6166,10 @@ void bhv_onoffswitch(void) {
                 cur_obj_play_sound_2(SOUND_GENERAL2_BUTTON_PRESS);
                 mb64_play_onoff = o->oBehParams2ndByte;
             }
-            if (o->oBehParams2ndByte == 0) {
-                if (!mb64_play_onoff) {
-                    o->oAction = 2;
-                }
-            } else { // Blue
-                if (mb64_play_onoff) {
-                    o->oAction = 2;
-                }
+            if ((o->oAnimState == 0) && (!mb64_play_onoff)) {
+                o->oAction = 2;
+            } else if ((o->oAnimState != 0) && (mb64_play_onoff)) {
+                o->oAction = 2;
             }
             break;
         case 2: // switch down
@@ -6184,33 +6187,29 @@ void bhv_onoffswitch(void) {
     }
 }
 
+void bhv_onoffblock_init(void) {
+    if (o->oBehParams2ndByte == 0) {
+        o->oAnimState = 0;
+    } else {
+        o->oAnimState = 1;
+    }
+}
+
 void bhv_onoffblock(void) {
-    switch(o->oAction){
-        case 0: //init
-            if (o->oBehParams2ndByte == 0) {
-                o->oAnimState = 0;
-            } else {
-                o->oAnimState = 1;
-            }
-            o->oAction = 1;
-            break;
-        case 1: //loop
-            if (o->oBehParams2ndByte == 0) {
-                if (mb64_play_onoff) {
-                    o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_OFF];
-                } else {
-                    load_object_collision_model();
-                    o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_ON];
-                }
-            } else {
-                if (mb64_play_onoff) {
-                    load_object_collision_model();
-                    o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_ON];
-                } else {
-                    o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_OFF];
-                }
-            }
-            break;
+    if (o->oBehParams2ndByte == 0) {
+        if (mb64_play_onoff) {
+            o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_OFF];
+        } else {
+            load_object_collision_model();
+            o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_ON];
+        }
+    } else {
+        if (mb64_play_onoff) {
+            load_object_collision_model();
+            o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_ON];
+        } else {
+            o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_OFF];
+        }
     }
 }
 
@@ -6271,12 +6270,15 @@ void bhv_woodplat(void) {
                 o->oGravity = -4.0f;
             } else {
                 // Underwater Behavior
-                if (ABS(o->oVelY) > 4.0f) {
-                    o->oVelY *= 0.95f;
+                o->oVelY *= 0.9f;
+                if (waterLevel > o->oPosY) {
+                    o->oGravity = CLAMP((waterLevel - 64.f - o->oPosY) * 0.1f, -2.0f, 2.0f);
                 }
-                o->oGravity = -1.0f;
-                if (waterLevel-50.0f > o->oPosY) {
-                    o->oVelY += 2.0f;
+                if (gMarioPlatform == o->prevObj) {
+                    o->oVelY -= 1.f;
+                    if (gMarioState->action == ACT_GROUND_POUND_LAND) {
+                        o->oVelY -= 2.f;
+                    }
                 }
             }
             cur_obj_update_floor_and_walls();
@@ -6285,13 +6287,21 @@ void bhv_woodplat(void) {
             // upwards sloped conveyor in order to not get stuck on the wall of
             // the conveyor above.
             if (o->oFloor->type == SURFACE_CONVEYOR &&
-                o->oFloor->object->oExtraVariable1 > 0 &&
+                o->oFloor->object->oExtraVariable1 != 0 &&
                 o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
                 o->oFlags &= ~OBJ_FLAG_SIMPLE_WALL_CHECKS;
             } else {
                 o->oFlags |= OBJ_FLAG_SIMPLE_WALL_CHECKS;
             }
             cur_obj_move_standard(-20);
+
+            if (cur_obj_die_if_on_death_barrier(MB64_STAR_HEIGHT)) {
+                struct Object *curPlat = o;
+                do {
+                    curPlat->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+                    curPlat = curPlat->oWoodPlatAbovePlatform;
+                } while (curPlat);
+            }
 
             Vec3f oldPos;
             vec3f_copy(oldPos, &o->prevObj->oPosVec);

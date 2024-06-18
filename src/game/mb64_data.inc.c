@@ -43,7 +43,7 @@ s8 slope_decal_uvs1[3][2] = {{0, 0}, {0, 16}, {16, 16}};
 s8 slope_decal_uvs2[3][2] = {{16, 16}, {16, 0}, {0, 16}};
 
 struct mb64_terrain_poly mb64_terrain_slope_quads[] = {
-    {{{16, 0, 16}, {16, 16, 0}, {0, 0, 16}, {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY, MB64_GROWTH_FULL, NULL}, // TOP
+    {{{16, 0, 16}, {16, 16, 0}, {0, 0, 16}, {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_FULL, NULL}, // TOP
     {{{16, 0, 16}, {0, 0, 16},  {16, 0, 0}, {0, 0, 0}},  MB64_DIRECTION_DOWN,  MB64_FACESHAPE_FULL, 0, NULL}, // BOTTOM
     {{{16, 16, 0}, {16, 0, 0},  {0, 16, 0}, {0, 0, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_FULL, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
 };
@@ -60,13 +60,31 @@ struct mb64_terrain mb64_terrain_slope = {
     mb64_terrain_slope_tris,
 };
 
+struct mb64_terrain_poly mb64_terrain_dslope_quads[] = {
+    {{{16, 16, 16}, {16, 16, 0}, {0, 16, 16}, {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_FULL, MB64_GROWTH_FULL, NULL}, // TOP
+    {{{16, 16, 0},  {16, 0, 0},  {0, 16, 0},  {0, 0, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_FULL, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
+    {{{16, 16, 16}, {0, 16, 16}, {16, 0, 0},  {0, 0, 0}},  MB64_DIRECTION_DOWN,  MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_NORMAL_SIDE, NULL}, // BOTTOM
+};
+
+struct mb64_terrain_poly mb64_terrain_dslope_tris[] = {
+    {{{16, 0, 0}, {16, 16, 0}, {16, 16, 16}},  MB64_DIRECTION_POS_X, MB64_FACESHAPE_DOWNTRI_1, MB64_GROWTH_NORMAL_SIDE, NULL}, // LEFT
+    {{{0, 16, 0}, {0, 0, 0},   {0, 16, 16}},   MB64_DIRECTION_NEG_X, MB64_FACESHAPE_DOWNTRI_2, MB64_GROWTH_NORMAL_SIDE, NULL}, // RIGHT
+};
+
+struct mb64_terrain mb64_terrain_dslope = {
+    3,
+    2,
+    mb64_terrain_dslope_quads,
+    mb64_terrain_dslope_tris,
+};
+
 struct mb64_terrain_poly mb64_terrain_corner_quads[] = {
     {{{16, 0, 16}, {0, 0, 16}, {16, 0, 0}, {0, 0, 0}}, MB64_DIRECTION_DOWN, MB64_FACESHAPE_FULL, 0, NULL}, // BOTTOM
 };
 
 struct mb64_terrain_poly mb64_terrain_corner_tris[] = {
-    {{{0, 0, 16}, {16, 0, 16}, {0, 16, 0}},  MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY, MB64_GROWTH_FULL, NULL}, // TOP-FRONT
-    {{{0, 16, 0}, {16, 0, 16}, {16, 0, 0}},  MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY, MB64_GROWTH_FULL, NULL}, // TOP-LEFT 
+    {{{0, 0, 16}, {16, 0, 16}, {0, 16, 0}},  MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_FULL, NULL}, // TOP-FRONT
+    {{{0, 16, 0}, {16, 0, 16}, {16, 0, 0}},  MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY_0, MB64_GROWTH_FULL, NULL}, // TOP-LEFT 
     {{{0, 16, 0}, {0, 0, 0},   {0, 0, 16}},  MB64_DIRECTION_NEG_X, MB64_FACESHAPE_TRI_2, MB64_GROWTH_SLOPE_SIDE_R, &slope_decal_uvs2}, // RIGHT
     {{{0, 0, 0},  {0, 16, 0},  {16, 0, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_TRI_1, MB64_GROWTH_SLOPE_SIDE_L, &slope_decal_uvs1}, // BACK
 };
@@ -83,8 +101,8 @@ struct mb64_terrain_poly mb64_terrain_dcorner_quads[] = {
 };
 
 struct mb64_terrain_poly mb64_terrain_dcorner_tris[] = {
-    {{{16, 16, 16}, {0, 16, 16}, {0, 0, 0}},    MB64_DIRECTION_POS_Z, MB64_FACESHAPE_EMPTY, MB64_GROWTH_NORMAL_SIDE, NULL}, // BOTTOM-FRONT
-    {{{0, 0, 0},    {16, 16, 0}, {16, 16, 16}}, MB64_DIRECTION_POS_X, MB64_FACESHAPE_EMPTY, MB64_GROWTH_NORMAL_SIDE, NULL}, // BOTTOM-LEFT 
+    {{{16, 16, 16}, {0, 16, 16}, {0, 0, 0}},    MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_NORMAL_SIDE, NULL}, // BOTTOM-FRONT
+    {{{0, 0, 0},    {16, 16, 0}, {16, 16, 16}}, MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY_0, MB64_GROWTH_NORMAL_SIDE, NULL}, // BOTTOM-LEFT 
     {{{0, 0, 0},    {0, 16, 16}, {0, 16, 0}},   MB64_DIRECTION_NEG_X, MB64_FACESHAPE_DOWNTRI_2, MB64_GROWTH_NORMAL_SIDE, NULL}, // RIGHT
     {{{0, 0, 0},    {0, 16, 0},  {16, 16, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_DOWNTRI_1, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
 };
@@ -104,8 +122,8 @@ struct mb64_terrain_poly mb64_terrain_icorner_quads[] = {
 };
 
 struct mb64_terrain_poly mb64_terrain_icorner_tris[] = {
-    {{{0, 16, 16}, {16, 0, 16}, {0, 16, 0}},  MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY, MB64_GROWTH_FULL, NULL}, // TOP-FRONT
-    {{{0, 16, 0},  {16, 0, 16}, {16, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY, MB64_GROWTH_FULL, NULL}, // TOP-LEFT
+    {{{0, 16, 16}, {16, 0, 16}, {0, 16, 0}},  MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY_0, MB64_GROWTH_FULL, NULL}, // TOP-FRONT
+    {{{0, 16, 0},  {16, 0, 16}, {16, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_FULL, NULL}, // TOP-LEFT
     {{{16, 0, 0},  {16, 16, 0}, {16, 0, 16}}, MB64_DIRECTION_POS_X, MB64_FACESHAPE_TRI_1, MB64_GROWTH_SLOPE_SIDE_L, &slope_decal_uvs1}, // LEFT
     {{{0, 16, 16}, {0, 0, 16},  {16, 0, 16}}, MB64_DIRECTION_POS_Z, MB64_FACESHAPE_TRI_2, MB64_GROWTH_SLOPE_SIDE_R, &slope_decal_uvs2}, // FRONT
 };
@@ -126,8 +144,8 @@ struct mb64_terrain_poly mb64_terrain_dicorner_quads[] = {
 struct mb64_terrain_poly mb64_terrain_dicorner_tris[] = {
     {{{16, 0, 0},   {16, 16, 0}, {16, 16, 16}}, MB64_DIRECTION_POS_X, MB64_FACESHAPE_DOWNTRI_1, MB64_GROWTH_NORMAL_SIDE, NULL}, // LEFT
     {{{0, 16, 16},  {0, 0, 16},  {16, 16, 16}}, MB64_DIRECTION_POS_Z, MB64_FACESHAPE_DOWNTRI_2, MB64_GROWTH_NORMAL_SIDE, NULL}, // FRONT
-    {{{16, 16, 16}, {0, 0, 16},  {0, 0, 0}},    MB64_DIRECTION_POS_X, MB64_FACESHAPE_EMPTY, MB64_GROWTH_UNDERSLOPE_CORNER, NULL}, // BOTTOM-FRONT
-    {{{16, 16, 16}, {0, 0, 0},   {16, 0, 0}},   MB64_DIRECTION_POS_Z, MB64_FACESHAPE_EMPTY, MB64_GROWTH_UNDERSLOPE_CORNER, NULL}, // BOTTOM-LEFT
+    {{{16, 16, 16}, {0, 0, 16},  {0, 0, 0}},    MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY_0, MB64_GROWTH_UNDERSLOPE_CORNER, NULL}, // BOTTOM-FRONT
+    {{{16, 16, 16}, {0, 0, 0},   {16, 0, 0}},   MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_UNDERSLOPE_CORNER, NULL}, // BOTTOM-LEFT
 };
 
 struct mb64_terrain mb64_terrain_dicorner = {
@@ -135,24 +153,6 @@ struct mb64_terrain mb64_terrain_dicorner = {
     4,
     mb64_terrain_dicorner_quads,
     mb64_terrain_dicorner_tris,
-};
-
-struct mb64_terrain_poly mb64_terrain_dslope_quads[] = {
-    {{{16, 16, 16}, {16, 16, 0}, {0, 16, 16}, {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_FULL, MB64_GROWTH_FULL, NULL}, // TOP
-    {{{16, 16, 0},  {16, 0, 0},  {0, 16, 0},  {0, 0, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_FULL, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
-    {{{16, 16, 16}, {0, 16, 16}, {16, 0, 0},  {0, 0, 0}},  MB64_DIRECTION_POS_Z, MB64_FACESHAPE_EMPTY, MB64_GROWTH_NORMAL_SIDE, NULL}, // BOTTOM
-};
-
-struct mb64_terrain_poly mb64_terrain_dslope_tris[] = {
-    {{{16, 0, 0}, {16, 16, 0}, {16, 16, 16}},  MB64_DIRECTION_POS_X, MB64_FACESHAPE_DOWNTRI_1, MB64_GROWTH_NORMAL_SIDE, NULL}, // LEFT
-    {{{0, 16, 0}, {0, 0, 0},   {0, 16, 16}},   MB64_DIRECTION_NEG_X, MB64_FACESHAPE_DOWNTRI_2, MB64_GROWTH_NORMAL_SIDE, NULL}, // RIGHT
-};
-
-struct mb64_terrain mb64_terrain_dslope = {
-    3,
-    2,
-    mb64_terrain_dslope_quads,
-    mb64_terrain_dslope_tris,
 };
 
 struct mb64_terrain_poly mb64_terrain_sslope_quads[] = {
@@ -173,11 +173,13 @@ struct mb64_terrain mb64_terrain_sslope = {
     mb64_terrain_sslope_tris,
 };
 
+s8 scorner_slope_tri_uvs[3][2] = {{16, 0}, {0, 0}, {8, 16}};
+
 struct mb64_terrain_poly mb64_terrain_scorner_tris[] = {
-    {{{0, 0, 16}, {16, 0, 0}, {0, 16, 0}},  MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY, MB64_GROWTH_FULL, NULL}, // TOP
-    {{{16, 0, 0},  {0, 0, 16},  {0, 0, 0}},  MB64_DIRECTION_DOWN, MB64_FACESHAPE_TOPTRI, 0, NULL}, // BOTTOM
-    {{{0, 16, 0}, {0, 0, 0},   {0, 0, 16}},  MB64_DIRECTION_NEG_X, MB64_FACESHAPE_TRI_2, MB64_GROWTH_SLOPE_SIDE_R, &slope_decal_uvs2}, // RIGHT
-    {{{0, 0, 0},  {0, 16, 0},  {16, 0, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_TRI_1, MB64_GROWTH_SLOPE_SIDE_L, &slope_decal_uvs1}, // BACK
+    {{{0, 0, 16}, {16, 0, 0}, {0, 16, 0}},  MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_FULL, &scorner_slope_tri_uvs}, // TOP
+    {{{16, 0, 0},  {0, 0, 16},  {0, 0, 0}}, MB64_DIRECTION_DOWN, MB64_FACESHAPE_TOPTRI, 0, NULL}, // BOTTOM
+    {{{0, 16, 0}, {0, 0, 0},   {0, 0, 16}}, MB64_DIRECTION_NEG_X, MB64_FACESHAPE_TRI_2, MB64_GROWTH_SLOPE_SIDE_R, &slope_decal_uvs2}, // RIGHT
+    {{{0, 0, 0},  {0, 16, 0},  {16, 0, 0}}, MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_TRI_1, MB64_GROWTH_SLOPE_SIDE_L, &slope_decal_uvs1}, // BACK
 };
 
 struct mb64_terrain mb64_terrain_scorner = {
@@ -187,11 +189,13 @@ struct mb64_terrain mb64_terrain_scorner = {
     mb64_terrain_scorner_tris,
 };
 
+s8 dscorner_slope_tri_uvs[3][2] = {{0, 16}, {16, 16}, {8, 0}};
+
 struct mb64_terrain_poly mb64_terrain_dscorner_tris[] = {
-    {{{16, 16, 0}, {0, 16, 16}, {0, 0, 0}},    MB64_DIRECTION_POS_Z, MB64_FACESHAPE_EMPTY, MB64_GROWTH_DIAGONAL_SIDE, NULL}, // BOTTOM
-    {{{0, 16, 16}, {16, 16, 0}, {0, 16, 0}}, MB64_DIRECTION_UP,   MB64_FACESHAPE_TOPTRI, MB64_GROWTH_FULL, NULL}, // TOP
-    {{{0, 0, 0},    {0, 16, 16}, {0, 16, 0}},   MB64_DIRECTION_NEG_X, MB64_FACESHAPE_DOWNTRI_2, MB64_GROWTH_NORMAL_SIDE, NULL}, // RIGHT
-    {{{0, 0, 0},    {0, 16, 0},  {16, 16, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_DOWNTRI_1, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
+    {{{16, 16, 0}, {0, 16, 16}, {0, 0, 0}},    MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_DIAGONAL_SIDE, &dscorner_slope_tri_uvs}, // BOTTOM
+    {{{0, 16, 16}, {16, 16, 0}, {0, 16, 0}},   MB64_DIRECTION_UP,   MB64_FACESHAPE_TOPTRI, MB64_GROWTH_FULL, NULL}, // TOP
+    {{{0, 0, 0},    {0, 16, 16}, {0, 16, 0}},  MB64_DIRECTION_NEG_X, MB64_FACESHAPE_DOWNTRI_2, MB64_GROWTH_NORMAL_SIDE, NULL}, // RIGHT
+    {{{0, 0, 0},    {0, 16, 0},  {16, 16, 0}}, MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_DOWNTRI_1, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
 };
 
 struct mb64_terrain mb64_terrain_dscorner = {
@@ -250,13 +254,15 @@ struct mb64_terrain mb64_terrain_vslab = {
     NULL
 };
 
+s8 gentle_slope_uvs[4][2] = {{0, 0}, {0, 16}, {16, 0}, {16, 16}};
+
 s8 gentle_decal_tri_uvs1[3][2] = {{0, 8}, {0, 16}, {16, 16}};
 s8 gentle_decal_tri_uvs2[3][2] = {{16, 16}, {16, 8}, {0, 16}};
 s8 ugentle_decal_quad_uvs1[4][2] = {{16, 16}, {16, 8}, {0, 8}, {0, 0}};
 s8 ugentle_decal_quad_uvs2[4][2] = {{16, 8}, {16, 0}, {0, 16}, {0, 8}};
 
 struct mb64_terrain_poly mb64_terrain_ugentle_quads[] = {
-    {{{16, 8, 16}, {16, 16, 0}, {0, 8, 16}, {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY, MB64_GROWTH_FULL, NULL}, // TOP
+    {{{16, 8, 16}, {16, 16, 0}, {0, 8, 16}, {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_FULL, &gentle_slope_uvs}, // TOP
     {{{16, 0, 16}, {0, 0, 16},  {16, 0, 0}, {0, 0, 0}},  MB64_DIRECTION_DOWN,  MB64_FACESHAPE_FULL, 0, NULL}, // BOTTOM
     {{{16, 16, 0}, {16, 0, 0},  {0, 16, 0}, {0, 0, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_FULL, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
     {{{0, 8, 16},  {0, 0, 16},  {16, 8, 16}, {16, 0, 16}}, MB64_DIRECTION_POS_Z, MB64_FACESHAPE_BOTTOMSLAB, MB64_GROWTH_UNCONDITIONAL, &bottomslab_decal_uvs1}, // FRONT
@@ -277,9 +283,9 @@ struct mb64_terrain mb64_terrain_ugentle = {
 };
 
 struct mb64_terrain_poly mb64_terrain_dugentle_quads[] = {
-    {{{16, 16, 16}, {16, 16, 0}, {0, 16, 16}, {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_FULL, MB64_GROWTH_FULL, NULL}, // TOP
-    {{{16, 16, 0},  {16, 0, 0},  {0, 16, 0},  {0, 0, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_FULL, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
-    {{{16, 8, 16}, {0, 8, 16}, {16, 0, 0},  {0, 0, 0}},  MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY, MB64_GROWTH_NONE, NULL}, // BOTTOM
+    {{{16, 16, 16}, {16, 16, 0}, {0, 16, 16},  {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_FULL, MB64_GROWTH_FULL, NULL}, // TOP
+    {{{16, 16, 0},  {16, 0, 0},  {0, 16, 0},   {0, 0, 0}},  MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_FULL, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
+    {{{16, 0, 0},   {16, 8, 16}, {0, 0, 0},    {0, 8, 16}},  MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_NONE, &gentle_slope_uvs}, // BOTTOM
     {{{0, 16, 16},  {0, 8, 16},  {16, 16, 16}, {16, 8, 16}}, MB64_DIRECTION_POS_Z, MB64_FACESHAPE_TOPSLAB, MB64_GROWTH_NORMAL_SIDE, NULL}, // FRONT
     {{{16, 16, 16}, {16, 8, 16}, {16, 16, 0},  {16, 8, 0}},  MB64_DIRECTION_POS_X, MB64_FACESHAPE_TOPSLAB, MB64_GROWTH_NORMAL_SIDE, NULL}, // LEFT
     {{{0, 16, 0},   {0, 8, 0},   {0, 16, 16},  {0, 8, 16}},  MB64_DIRECTION_NEG_X, MB64_FACESHAPE_TOPSLAB, MB64_GROWTH_NORMAL_SIDE, NULL}, // RIGHT
@@ -298,7 +304,7 @@ struct mb64_terrain mb64_terrain_dugentle = {
 };
 
 struct mb64_terrain_poly mb64_terrain_lgentle_quads[] = {
-    {{{16, 0, 16}, {16, 8, 0}, {0, 0, 16}, {0, 8, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY, MB64_GROWTH_FULL, NULL}, // TOP
+    {{{16, 0, 16}, {16, 8, 0}, {0, 0, 16}, {0, 8, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_FULL, &gentle_slope_uvs}, // TOP
     {{{16, 0, 16}, {0, 0, 16},  {16, 0, 0}, {0, 0, 0}},  MB64_DIRECTION_DOWN,  MB64_FACESHAPE_FULL, 0, NULL}, // BOTTOM
     {{{16, 8, 0},  {16, 0, 0},  {0, 8, 0},   {0, 0, 0}},   MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_BOTTOMSLAB, MB64_GROWTH_UNCONDITIONAL, &bottomslab_decal_uvs1}, // BACK
 };
@@ -320,7 +326,7 @@ s8 dlgentle_decal_uvs[4][2] = {{0, 16}, {16, 16}, {0, 8}, {16, 8}};
 struct mb64_terrain_poly mb64_terrain_dlgentle_quads[] = {
     {{{16, 16, 16}, {16, 16, 0}, {0, 16, 16}, {0, 16, 0}}, MB64_DIRECTION_UP,    MB64_FACESHAPE_FULL, MB64_GROWTH_FULL, NULL}, // TOP
     {{{16, 16, 0},  {16, 8, 0},  {0, 16, 0},   {0, 8, 0}}, MB64_DIRECTION_NEG_Z, MB64_FACESHAPE_TOPSLAB, MB64_GROWTH_NORMAL_SIDE, NULL}, // BACK
-    {{{16, 16, 16}, {0, 16, 16}, {16, 8, 0},  {0, 8, 0}},  MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY, MB64_GROWTH_DLGENTLE_UNDER, dlgentle_decal_uvs}, // BOTTOM
+    {{{16, 8, 0},   {16, 16, 16}, {0, 8, 0},    {0, 16, 16}},  MB64_DIRECTION_DOWN, MB64_FACESHAPE_EMPTY_2, MB64_GROWTH_NORMAL_SIDE, &gentle_slope_uvs}, // BOTTOM
 };
 
 struct mb64_terrain_poly mb64_terrain_dlgentle_tris[] = {
@@ -808,184 +814,184 @@ char *mb64_matlist_names[] = {
 
 struct mb64_material mb64_mat_table[] = {
     // Terrain
-    {mat_maker_MakerGrass,        0, SURFACE_GRASS,        "Grass"},       // MB64_MAT_GRASS
-    {mat_maker_MakerVanillaGrass, 0, SURFACE_GRASS,        "Grass (Old)"}, // MB64_MAT_GRASS_OLD
-    {mat_maker_MakerCartoonGrass, 0, SURFACE_GRASS,        "Smooth Grass"},// MB64_MAT_CARTOON_GRASS
-    {mat_maker_MakerDarkGrass,    0, SURFACE_GRASS,        "Dark Grass"},  // MB64_MAT_DARK_GRASS
-    {mat_maker_MakerHGrass,       0, SURFACE_GRASS,        "Cave Grass"},  // MB64_MAT_HMC_GRASS
-    {mat_maker_MakerOrangeGrass,  0, SURFACE_GRASS,        "Orange Grass"},// MB64_MAT_ORANGE_GRASS
-    {mat_maker_MakerRedGrass,     0, SURFACE_GRASS,        "Red Grass"},   // MB64_MAT_RED_GRASS
-    {mat_maker_MakerPurpleGrass,  0, SURFACE_GRASS,        "Purple Grass"},// MB64_MAT_PURPLE_GRASS
-    {mat_maker_MakerSand,         0, SURFACE_SAND,         "Sand"},        // MB64_MAT_SAND
-    {mat_maker_MakerJRBSand,      0, SURFACE_SAND,         "Ocean Sand"},  // MB64_MAT_JRB_SAND
-    {mat_maker_MakerSnow,         0, SURFACE_SNOW,         "Snow"},        // MB64_MAT_SNOW
-    {mat_maker_MakerVanillaSnow,  0, SURFACE_SNOW,         "Snow (Old)"},  // MB64_MAT_SNOW_OLD
-    {mat_maker_MakerDirt,         0, SURFACE_NOT_SLIPPERY, "Dirt"},        // MB64_MAT_DIRT
-    {mat_maker_MakerSandDirt,     0, SURFACE_NOT_SLIPPERY, "Sandy Dirt"},  // MB64_MAT_SANDDIRT
-    {mat_maker_MakerLightDirt,    0, SURFACE_NOT_SLIPPERY, "Light Dirt"},  // MB64_MAT_LIGHTDIRT
-    {mat_maker_MakerHDirt,        0, SURFACE_NOT_SLIPPERY, "Cave Dirt"},   // MB64_MAT_HMC_DIRT
-    {mat_maker_MakerRockyDirt,    0, SURFACE_NOT_SLIPPERY, "Rocky Dirt"},  // MB64_MAT_ROCKY_DIRT
-    {mat_maker_MakerVanillaDirt,  0, SURFACE_NOT_SLIPPERY,  "Dirt (Old)"}, // MB64_MAT_DIRT_OLD
-    {mat_maker_MakerWavyDirt,     0, SURFACE_NOT_SLIPPERY, "Wavy Dirt"},   // MB64_MAT_WAVY_DIRT
-    {mat_maker_MakerWavyDirtBlue, 0, SURFACE_NOT_SLIPPERY, "Wavy Dirt (Blue)"}, // MB64_MAT_WAVY_DIRT_BLUE
-    {mat_maker_MakerSnowDirt,     0, SURFACE_NOT_SLIPPERY, "Snowy Dirt"},  // MB64_MAT_SNOWDIRT
-    {mat_maker_MakerPurpleDirt,   0, SURFACE_NOT_SLIPPERY, "Purple Dirt"}, // MB64_MAT_PURPLE_DIRT
-    {mat_maker_MakerHLakewall,    0, SURFACE_NOT_SLIPPERY, "Clay"},        // MB64_MAT_HMC_LAKEGRASS
+    {mat_maker_MakerGrass,        MAT_OPAQUE, FALSE, SURFACE_GRASS,        "Grass"},       // MB64_MAT_GRASS
+    {mat_maker_MakerVanillaGrass, MAT_OPAQUE, FALSE, SURFACE_GRASS,        "Grass (Old)"}, // MB64_MAT_GRASS_OLD
+    {mat_maker_MakerCartoonGrass, MAT_OPAQUE, FALSE, SURFACE_GRASS,        "Smooth Grass"},// MB64_MAT_CARTOON_GRASS
+    {mat_maker_MakerDarkGrass,    MAT_OPAQUE, FALSE, SURFACE_GRASS,        "Dark Grass"},  // MB64_MAT_DARK_GRASS
+    {mat_maker_MakerHGrass,       MAT_OPAQUE, FALSE, SURFACE_GRASS,        "Cave Grass"},  // MB64_MAT_HMC_GRASS
+    {mat_maker_MakerOrangeGrass,  MAT_OPAQUE, FALSE, SURFACE_GRASS,        "Orange Grass"},// MB64_MAT_ORANGE_GRASS
+    {mat_maker_MakerRedGrass,     MAT_OPAQUE, FALSE, SURFACE_GRASS,        "Red Grass"},   // MB64_MAT_RED_GRASS
+    {mat_maker_MakerPurpleGrass,  MAT_OPAQUE, FALSE, SURFACE_GRASS,        "Purple Grass"},// MB64_MAT_PURPLE_GRASS
+    {mat_maker_MakerSand,         MAT_OPAQUE, FALSE, SURFACE_SAND,         "Sand"},        // MB64_MAT_SAND
+    {mat_maker_MakerJRBSand,      MAT_OPAQUE, FALSE, SURFACE_SAND,         "Ocean Sand"},  // MB64_MAT_JRB_SAND
+    {mat_maker_MakerSnow,         MAT_OPAQUE, FALSE, SURFACE_SNOW,         "Snow"},        // MB64_MAT_SNOW
+    {mat_maker_MakerVanillaSnow,  MAT_OPAQUE, FALSE, SURFACE_SNOW,         "Snow (Old)"},  // MB64_MAT_SNOW_OLD
+    {mat_maker_MakerDirt,         MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Dirt"},        // MB64_MAT_DIRT
+    {mat_maker_MakerSandDirt,     MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Sandy Dirt"},  // MB64_MAT_SANDDIRT
+    {mat_maker_MakerLightDirt,    MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Light Dirt"},  // MB64_MAT_LIGHTDIRT
+    {mat_maker_MakerHDirt,        MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Cave Dirt"},   // MB64_MAT_HMC_DIRT
+    {mat_maker_MakerRockyDirt,    MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Rocky Dirt"},  // MB64_MAT_ROCKY_DIRT
+    {mat_maker_MakerVanillaDirt,  MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY,  "Dirt (Old)"}, // MB64_MAT_DIRT_OLD
+    {mat_maker_MakerWavyDirt,     MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Wavy Dirt"},   // MB64_MAT_WAVY_DIRT
+    {mat_maker_MakerWavyDirtBlue, MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Wavy Dirt (Blue)"}, // MB64_MAT_WAVY_DIRT_BLUE
+    {mat_maker_MakerSnowDirt,     MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Snowy Dirt"},  // MB64_MAT_SNOWDIRT
+    {mat_maker_MakerPurpleDirt,   MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Purple Dirt"}, // MB64_MAT_PURPLE_DIRT
+    {mat_maker_MakerHLakewall,    MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Clay"},        // MB64_MAT_HMC_LAKEGRASS
 
     // Stone
-    {mat_maker_MakerStoneSide,     0, SURFACE_DEFAULT,      "White Stone"},     // MB64_MAT_STONE
-    {mat_maker_MakerHStone,        0, SURFACE_NOT_SLIPPERY, "Cave Stone"},      // MB64_MAT_HMC_STONE
-    {mat_maker_MakerHMazefloor,    0, SURFACE_DEFAULT,      "Beige Stone"},     // MB64_MAT_HMC_MAZEFLOOR
-    {mat_maker_MakerCCMWall,       0, SURFACE_NOT_SLIPPERY, "Green Stone"},     // MB64_MAT_CCM_ROCK
-    {mat_maker_MakerMountainFloor, 0, SURFACE_NOT_SLIPPERY, "Mountain Stone"},  // MB64_MAT_TTM_FLOOR
-    {mat_maker_MakerMountainRock,  0, SURFACE_NOT_SLIPPERY, "Mountain Rock"},   // MB64_MAT_TTM_ROCK
-    {mat_maker_MakerStone,         0, SURFACE_NOT_SLIPPERY, "White Rock"},      // MB64_MAT_COBBLESTONE
-    {mat_maker_MakerJRBWall,       0, SURFACE_NOT_SLIPPERY, "Green Rock"},      // MB64_MAT_JRB_WALL
-    {mat_maker_MakerBlackStone,    0, SURFACE_DEFAULT,      "Black Rock"},      // MB64_MAT_GABBRO
-    {mat_maker_MakerRHRStone,      0, SURFACE_NOT_SLIPPERY, "Scorched Rock"},   // MB64_MAT_RHR_STONE
-    {mat_maker_MakerLavaRock,      0, SURFACE_NOT_SLIPPERY, "Volcanic Rocks"},  // MB64_MAT_LAVA_ROCKS
-    {mat_maker_MakerVolcanicRock,  0, SURFACE_DEFAULT,      "Volcanic Wall"},   // MB64_MAT_VOLCANO_WALL
-    {mat_maker_MakerRHRBasalt,     0, SURFACE_NOT_SLIPPERY, "Basalt"},          // MB64_MAT_RHR_BASALT
-    {mat_maker_MakerObsidian,      0, SURFACE_NOT_SLIPPERY, "Obsidian"},        // MB64_MAT_OBSIDIAN
-    {mat_maker_MakerCastleCobble,  0, SURFACE_NOT_SLIPPERY, "Plum Concrete"},   // MB64_MAT_CASTLE_STONE
-    {mat_maker_MakerJRBUnderwater, 0, SURFACE_NOT_SLIPPERY, "Ocean Floor"},     // MB64_MAT_JRB_UNDERWATER
-    {mat_maker_MakerSnowRock,      0, SURFACE_DEFAULT,      "Snowy Rock"},      // MB64_MAT_SNOW_ROCK
-    {mat_maker_MakerIcyRock,       0, SURFACE_VERY_SLIPPERY, "Icy Rock"},       // MB64_MAT_ICY_ROCK
-    {mat_maker_MakerDStone,        0, SURFACE_NOT_SLIPPERY, "Cobblestone (1)"}, // MB64_MAT_DESERT_STONE
-    {mat_maker_MakerRHRObsidian,   0, SURFACE_NOT_SLIPPERY, "Cobblestone (2)"}, // MB64_MAT_RHR_OBSIDIAN
-    {mat_maker_MakerJRBStone,      0, SURFACE_NOT_SLIPPERY, "Cobblestone (3)"}, // MB64_MAT_JRB_STONE
+    {mat_maker_MakerStoneSide,     MAT_OPAQUE, FALSE, SURFACE_DEFAULT,      "White Stone"},     // MB64_MAT_STONE
+    {mat_maker_MakerHStone,        MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Cave Stone"},      // MB64_MAT_HMC_STONE
+    {mat_maker_MakerHMazefloor,    MAT_OPAQUE, FALSE, SURFACE_DEFAULT,      "Beige Stone"},     // MB64_MAT_HMC_MAZEFLOOR
+    {mat_maker_MakerCCMWall,       MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Green Stone"},     // MB64_MAT_CCM_ROCK
+    {mat_maker_MakerMountainFloor, MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Mountain Stone"},  // MB64_MAT_TTM_FLOOR
+    {mat_maker_MakerMountainRock,  MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Mountain Rock"},   // MB64_MAT_TTM_ROCK
+    {mat_maker_MakerStone,         MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "White Rock"},      // MB64_MAT_COBBLESTONE
+    {mat_maker_MakerJRBWall,       MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Green Rock"},      // MB64_MAT_JRB_WALL
+    {mat_maker_MakerBlackStone,    MAT_OPAQUE, FALSE, SURFACE_DEFAULT,      "Black Rock"},      // MB64_MAT_GABBRO
+    {mat_maker_MakerRHRStone,      MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Scorched Rock"},   // MB64_MAT_RHR_STONE
+    {mat_maker_MakerLavaRock,      MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Volcanic Rocks"},  // MB64_MAT_LAVA_ROCKS
+    {mat_maker_MakerVolcanicRock,  MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Volcanic Wall"},   // MB64_MAT_VOLCANO_WALL
+    {mat_maker_MakerRHRBasalt,     MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Basalt"},          // MB64_MAT_RHR_BASALT
+    {mat_maker_MakerObsidian,      MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Obsidian"},        // MB64_MAT_OBSIDIAN
+    {mat_maker_MakerCastleCobble,  MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Plum Concrete"},   // MB64_MAT_CASTLE_STONE
+    {mat_maker_MakerJRBUnderwater, MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Ocean Floor"},     // MB64_MAT_JRB_UNDERWATER
+    {mat_maker_MakerSnowRock,      MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Snowy Rock"},      // MB64_MAT_SNOW_ROCK
+    {mat_maker_MakerIcyRock,       MAT_OPAQUE, TRUE,  SURFACE_VERY_SLIPPERY, "Icy Rock"},       // MB64_MAT_ICY_ROCK
+    {mat_maker_MakerDStone,        MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Cobblestone (1)"}, // MB64_MAT_DESERT_STONE
+    {mat_maker_MakerRHRObsidian,   MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Cobblestone (2)"}, // MB64_MAT_RHR_OBSIDIAN
+    {mat_maker_MakerJRBStone,      MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Cobblestone (3)"}, // MB64_MAT_JRB_STONE
 
     // Bricks
-    {mat_maker_MakerBricks,         0, SURFACE_DEFAULT,      "Stone Bricks"},     // MB64_MAT_BRICKS
-    {mat_maker_MakerDBrick,         0, SURFACE_DEFAULT,      "Desert Bricks"},    // MB64_MAT_DESERT_BRICKS
-    {mat_maker_MakerRHRBrick,       0, SURFACE_NOT_SLIPPERY, "Scorched Bricks"},  // MB64_MAT_RHR_BRICK
-    {mat_maker_MakerHBrick,         0, SURFACE_DEFAULT,      "Cave Bricks"},      // MB64_MAT_HMC_BRICK
-    {mat_maker_MakerLightBrownBricks, 0, SURFACE_DEFAULT,    "Fortress Bricks"},  // MB64_MAT_LIGHTBROWN_BRICK
-    {mat_maker_MakerBrownBricks,    0, SURFACE_DEFAULT,      "Brown Bricks (1)"}, // MB64_MAT_WDW_BRICK
-    {mat_maker_MakerTTMBricks,      0, SURFACE_DEFAULT,      "Brown Bricks (2)"}, // MB64_MAT_TTM_BRICK
-    {mat_maker_MakerCBrick,         0, SURFACE_NOT_SLIPPERY, "Castle Bricks"},    // MB64_MAT_C_BRICK
-    {mat_maker_MakerBBHBricks,      0, SURFACE_NOT_SLIPPERY, "Red Bricks (1)"},   // MB64_MAT_BBH_BRICKS
-    {mat_maker_MakerRoofBricks,     0, SURFACE_DEFAULT,      "Red Bricks (2)"},   // MB64_MAT_ROOF_BRICKS
-    {mat_maker_MakerCOutsideBricks, 0, SURFACE_DEFAULT,      "White Bricks (1)"}, // MB64_MAT_C_OUTSIDE_BRICK
-    {mat_maker_MakerSnowBricks,     0, SURFACE_DEFAULT,      "White Bricks (2)"}, // MB64_MAT_SNOW_BRICKS
-    {mat_maker_MakerJRBBricks,      0, SURFACE_DEFAULT,      "Ocean Bricks"},     // MB64_MAT_JRB_BRICKS 
-    {mat_maker_MakerSnowTileSide,   0, SURFACE_DEFAULT,      "Blue Bricks"},      // MB64_MAT_SNOW_TILE_SIDE
-    {mat_maker_MakerTileBricks,     0, SURFACE_NOT_SLIPPERY, "Mixed Bricks"},     // MB64_MAT_TILESBRICKS
+    {mat_maker_MakerBricks,           MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Stone Bricks"},     // MB64_MAT_BRICKS
+    {mat_maker_MakerDBrick,           MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Desert Bricks"},    // MB64_MAT_DESERT_BRICKS
+    {mat_maker_MakerRHRBrick,         MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Scorched Bricks"},  // MB64_MAT_RHR_BRICK
+    {mat_maker_MakerHBrick,           MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Cave Bricks"},      // MB64_MAT_HMC_BRICK
+    {mat_maker_MakerLightBrownBricks, MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,    "Fortress Bricks"},  // MB64_MAT_LIGHTBROWN_BRICK
+    {mat_maker_MakerBrownBricks,      MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Brown Bricks (1)"}, // MB64_MAT_WDW_BRICK
+    {mat_maker_MakerTTMBricks,        MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Brown Bricks (2)"}, // MB64_MAT_TTM_BRICK
+    {mat_maker_MakerCBrick,           MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Castle Bricks"},    // MB64_MAT_C_BRICK
+    {mat_maker_MakerBBHBricks,        MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Red Bricks (1)"},   // MB64_MAT_BBH_BRICKS
+    {mat_maker_MakerRoofBricks,       MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Red Bricks (2)"},   // MB64_MAT_ROOF_BRICKS
+    {mat_maker_MakerCOutsideBricks,   MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "White Bricks (1)"}, // MB64_MAT_C_OUTSIDE_BRICK
+    {mat_maker_MakerSnowBricks,       MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "White Bricks (2)"}, // MB64_MAT_SNOW_BRICKS
+    {mat_maker_MakerJRBBricks,        MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Ocean Bricks"},     // MB64_MAT_JRB_BRICKS 
+    {mat_maker_MakerSnowTileSide,     MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Blue Bricks"},      // MB64_MAT_SNOW_TILE_SIDE
+    {mat_maker_MakerTileBricks,       MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Mixed Bricks"},     // MB64_MAT_TILESBRICKS
 
     // Tiling
-    {mat_maker_MakerTiles,          0, SURFACE_NOT_SLIPPERY, "Checkered Tiling"}, // MB64_MAT_TILES
-    {mat_maker_MakerCTiles,         0, SURFACE_NOT_SLIPPERY, "Castle Tiling"},    // MB64_MAT_C_TILES
-    {mat_maker_MakerDTiles,         0, SURFACE_NOT_SLIPPERY, "Desert Tiling"},    // MB64_MAT_DESERT_TILES
-    {mat_maker_MakerVBlueTiles,     0, SURFACE_NOT_SLIPPERY, "Blue Tiling (1)"},  // MB64_MAT_VP_BLUETILES
-    {mat_maker_MakerSnowTiles,      0, SURFACE_NOT_SLIPPERY, "Blue Tiling (2)"},  // MB64_MAT_SNOW_TILES
-    {mat_maker_MakerJRBTileTop,     0, SURFACE_NOT_SLIPPERY, "Ocean Tiling (1)"}, // MB64_MAT_JRB_TILETOP
-    {mat_maker_MakerJRBTileSide,    0, SURFACE_DEFAULT,      "Ocean Tiling (2)"}, // MB64_MAT_JRB_TILESIDE
-    {mat_maker_MakerHTileTop,       0, SURFACE_NOT_SLIPPERY, "Dark Tiling"},     // MB64_MAT_HMC_TILES
-    {mat_maker_MakerGraniteTiles,   0, SURFACE_NOT_SLIPPERY, "Granite Tiling"},   // MB64_MAT_GRANITE_TILES
-    {mat_maker_MakerRHRTiles,       0, SURFACE_DEFAULT,      "Black Tiling"},    // MB64_MAT_RHR_TILES
-    {mat_maker_MakerVTiles,         0, SURFACE_DEFAULT,      "Grey Tiling"},     // MB64_MAT_VP_TILES
-    {mat_maker_MakerDiamondPattern, 0, SURFACE_NOT_SLIPPERY, "Diamond Pattern"},  // MB64_MAT_DIAMOND_PATTERN
-    {mat_maker_MakerCStone,         0, SURFACE_NOT_SLIPPERY, "Hex Tiling"},       // MB64_MAT_C_STONETOP
-    {mat_maker_MakerSnowBrickTiles, 0, SURFACE_DEFAULT,      "Diamond Tiling"},   // MB64_MAT_SNOW_BRICK_TILES
+    {mat_maker_MakerTiles,          MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Checkered Tiling"}, // MB64_MAT_TILES
+    {mat_maker_MakerCTiles,         MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Castle Tiling"},    // MB64_MAT_C_TILES
+    {mat_maker_MakerDTiles,         MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Desert Tiling"},    // MB64_MAT_DESERT_TILES
+    {mat_maker_MakerVBlueTiles,     MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Blue Tiling (1)"},  // MB64_MAT_VP_BLUETILES
+    {mat_maker_MakerSnowTiles,      MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Blue Tiling (2)"},  // MB64_MAT_SNOW_TILES
+    {mat_maker_MakerJRBTileTop,     MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Ocean Tiling (1)"}, // MB64_MAT_JRB_TILETOP
+    {mat_maker_MakerJRBTileSide,    MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Ocean Tiling (2)"}, // MB64_MAT_JRB_TILESIDE
+    {mat_maker_MakerHTileTop,       MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Dark Tiling"},     // MB64_MAT_HMC_TILES
+    {mat_maker_MakerGraniteTiles,   MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Granite Tiling"},   // MB64_MAT_GRANITE_TILES
+    {mat_maker_MakerRHRTiles,       MAT_OPAQUE, FALSE, SURFACE_DEFAULT,      "Black Tiling"},    // MB64_MAT_RHR_TILES
+    {mat_maker_MakerVTiles,         MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Grey Tiling"},     // MB64_MAT_VP_TILES
+    {mat_maker_MakerDiamondPattern, MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Diamond Pattern"},  // MB64_MAT_DIAMOND_PATTERN
+    {mat_maker_MakerCStone,         MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Hex Tiling"},       // MB64_MAT_C_STONETOP
+    {mat_maker_MakerSnowBrickTiles, MAT_OPAQUE, FALSE, SURFACE_DEFAULT,      "Diamond Tiling"},   // MB64_MAT_SNOW_BRICK_TILES
 
     // Cut Stone
-    {mat_maker_MakerDStoneBlock,     0, SURFACE_NOT_SLIPPERY, "Block"},           // MB64_MAT_DESERT_BLOCK
-    {mat_maker_MakerVBlock,          0, SURFACE_DEFAULT,      "Smooth Block"},    // MB64_MAT_VP_BLOCK
-    {mat_maker_MakerBBHWall,         0, SURFACE_DEFAULT,      "Mansion Wall"},    // MB64_MAT_BBH_STONE
-    {mat_maker_MakerBBHStonePattern, 0, SURFACE_DEFAULT,      "Chiseled Wall"},   // MB64_MAT_BBH_STONE_PATTERN
-    {mat_maker_MakerLauncherTex,     0, SURFACE_DEFAULT,      "Patterned Block"}, // MB64_MAT_PATTERNED_BLOCK
-    {mat_maker_MakerHTileSide,       0, SURFACE_DEFAULT,      "Black Slabs"},     // MB64_MAT_HMC_SLAB
-    {mat_maker_MakerRHRPattern,      0, SURFACE_NOT_SLIPPERY, "Chiseled Block"},  // MB64_MAT_RHR_BLOCK
-    {mat_maker_MakerGraniteBlock,    0, SURFACE_NOT_SLIPPERY, "Granite Block"},   // MB64_MAT_GRANITE_BLOCK
-    {mat_maker_MakerCStoneSide,      0, SURFACE_DEFAULT,      "Stone Slab"},      // MB64_MAT_C_STONESIDE
-    {mat_maker_MakerCPillar,         0, SURFACE_DEFAULT,      "Castle Pillar"},   // MB64_MAT_C_PILLAR
-    {mat_maker_MakerBBHPillar,       0, SURFACE_DEFAULT,      "Mansion Pillar"},  // MB64_MAT_BBH_PILLAR
-    {mat_maker_MakerRHRPillar,       0, SURFACE_DEFAULT,      "Scorched Pillar"}, // MB64_MAT_RHR_PILLAR
+    {mat_maker_MakerDStoneBlock,     MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, "Block"},           // MB64_MAT_DESERT_BLOCK
+    {mat_maker_MakerVBlock,          MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      "Smooth Block"},    // MB64_MAT_VP_BLOCK
+    {mat_maker_MakerBBHWall,         MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      "Mansion Wall"},    // MB64_MAT_BBH_STONE
+    {mat_maker_MakerBBHStonePattern, MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      "Chiseled Wall"},   // MB64_MAT_BBH_STONE_PATTERN
+    {mat_maker_MakerLauncherTex,     MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      "Patterned Block"}, // MB64_MAT_PATTERNED_BLOCK
+    {mat_maker_MakerHTileSide,       MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      "Black Slabs"},     // MB64_MAT_HMC_SLAB
+    {mat_maker_MakerRHRPattern,      MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, "Chiseled Block"},  // MB64_MAT_RHR_BLOCK
+    {mat_maker_MakerGraniteBlock,    MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, "Granite Block"},   // MB64_MAT_GRANITE_BLOCK
+    {mat_maker_MakerCStoneSide,      MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      "Stone Slab"},      // MB64_MAT_C_STONESIDE
+    {mat_maker_MakerCPillar,         MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      "Castle Pillar"},   // MB64_MAT_C_PILLAR
+    {mat_maker_MakerBBHPillar,       MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      "Mansion Pillar"},  // MB64_MAT_BBH_PILLAR
+    {mat_maker_MakerRHRPillar,       MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, "Scorched Pillar"}, // MB64_MAT_RHR_PILLAR
 
     // Wood
-    {mat_maker_MakerWood,            0, SURFACE_CREAKWOOD,    "Planks (1)"},    // MB64_MAT_WOOD
-    {mat_maker_MakerBBHWoodWall,     0, SURFACE_CREAKWOOD,    "Planks (2)"},    // MB64_MAT_BBH_WOOD_WALL
-    {mat_maker_MakerBBHWoodFloor,    0, SURFACE_CREAKWOOD,    "Dark Planks"},   // MB64_MAT_BBH_WOOD_FLOOR
-    {mat_maker_MakerCWood,           0, SURFACE_CREAKWOOD,    "Castle Planks"}, // MB64_MAT_C_WOOD
-    {mat_maker_MakerJRBWood,         0, SURFACE_CREAKWOOD,    "Docks"},         // MB64_MAT_JRB_WOOD
-    {mat_maker_MakerJRBShipSide,     0, SURFACE_CREAKWOOD,    "Ship Planks"},   // MB64_MAT_JRB_SHIPSIDE
-    {mat_maker_MakerJRBShipTop,      0, SURFACE_CREAKWOOD,    "Ship Decking"},  // MB64_MAT_JRB_SHIPTOP
-    {mat_maker_MakerBBHHauntedPlanks,0, SURFACE_CREAKWOOD,    "Spooky Planks"}, // MB64_MAT_BBH_HAUNTED_PLANKS
-    {mat_maker_MakerBBHRoof,         0, SURFACE_CREAKWOOD,    "Mansion Roof"},  // MB64_MAT_BBH_ROOF
-    {mat_maker_MakerSolidWood,       0, SURFACE_NOT_SLIPPERY, "Wood (Old)"},    // MB64_MAT_SOLID_WOOD
-    {mat_maker_MakerRHRWood,         0, SURFACE_NOT_SLIPPERY, "Scorched Wood"}, // MB64_MAT_RHR_WOOD
+    {mat_maker_MakerWood,             MAT_OPAQUE, TRUE,  SURFACE_CREAKWOOD,    "Planks (1)"},    // MB64_MAT_WOOD
+    {mat_maker_MakerBBHWoodWall,      MAT_OPAQUE, TRUE,  SURFACE_CREAKWOOD,    "Planks (2)"},    // MB64_MAT_BBH_WOOD_WALL
+    {mat_maker_MakerBBHWoodFloor,     MAT_OPAQUE, TRUE,  SURFACE_CREAKWOOD,    "Dark Planks"},   // MB64_MAT_BBH_WOOD_FLOOR
+    {mat_maker_MakerCWood,            MAT_OPAQUE, TRUE,  SURFACE_CREAKWOOD,    "Castle Planks"}, // MB64_MAT_C_WOOD
+    {mat_maker_MakerJRBWood,          MAT_OPAQUE, TRUE,  SURFACE_CREAKWOOD,    "Docks"},         // MB64_MAT_JRB_WOOD
+    {mat_maker_MakerJRBShipSide,      MAT_OPAQUE, TRUE,  SURFACE_CREAKWOOD,    "Ship Planks"},   // MB64_MAT_JRB_SHIPSIDE
+    {mat_maker_MakerJRBShipTop,       MAT_OPAQUE, TRUE,  SURFACE_CREAKWOOD,    "Ship Decking"},  // MB64_MAT_JRB_SHIPTOP
+    {mat_maker_MakerBBHHauntedPlanks, MAT_OPAQUE, TRUE,  SURFACE_CREAKWOOD,    "Spooky Planks"}, // MB64_MAT_BBH_HAUNTED_PLANKS
+    {mat_maker_MakerBBHRoof,          MAT_OPAQUE, FALSE, SURFACE_CREAKWOOD,    "Mansion Roof"},  // MB64_MAT_BBH_ROOF
+    {mat_maker_MakerSolidWood,        MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Wood (Old)"},    // MB64_MAT_SOLID_WOOD
+    {mat_maker_MakerRHRWood,          MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY, "Scorched Wood"}, // MB64_MAT_RHR_WOOD
 
     // Metal
-    {mat_maker_MakerBBHMetal,        0, SURFACE_NOT_SLIPPERY, "Metal Flooring"},   // MB64_MAT_BBH_METAL
-    {mat_maker_MakerJRBMetalSide,    0, SURFACE_DEFAULT,      "Metal Sheet"},      // MB64_MAT_JRB_METALSIDE
-    {mat_maker_MakerJRBMetal,        0, SURFACE_DEFAULT,      "Metal Plating"},    // MB64_MAT_JRB_METAL
-    {mat_maker_MakerCBasementWall,   0, SURFACE_DEFAULT,      "Basement Plating"}, // MB64_MAT_C_BASEMENTWALL
-    {mat_maker_MakerDTiles2,         0, SURFACE_DEFAULT,      "Desert Plating"},   // MB64_MAT_DESERT_TILES2
-    {mat_maker_MakerVRustyBlock,     0, SURFACE_DEFAULT,      "Rusted Block"},     // MB64_MAT_VP_RUSTYBLOCK
+    {mat_maker_MakerBBHMetal,        MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Metal Flooring"},   // MB64_MAT_BBH_METAL
+    {mat_maker_MakerJRBMetalSide,    MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Metal Sheet"},      // MB64_MAT_JRB_METALSIDE
+    {mat_maker_MakerJRBMetal,        MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Metal Plating"},    // MB64_MAT_JRB_METAL
+    {mat_maker_MakerCBasementWall,   MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Basement Plating"}, // MB64_MAT_C_BASEMENTWALL
+    {mat_maker_MakerDTiles2,         MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Desert Plating"},   // MB64_MAT_DESERT_TILES2
+    {mat_maker_MakerVRustyBlock,     MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,      "Rusted Block"},     // MB64_MAT_VP_RUSTYBLOCK
 
     // Other
-    {mat_maker_MakerCCarpet,   0, SURFACE_GRASS,         "Carpet"},         // MB64_MAT_C_CARPET
-    {mat_maker_MakerCWall,     0, SURFACE_DEFAULT,       "Castle Wall"},    // MB64_MAT_C_WALL
-    {mat_maker_MakerRoof,      0, SURFACE_NOT_SLIPPERY,  "Roof"},           // MB64_MAT_ROOF
-    {mat_maker_MakerCRoof,     0, SURFACE_NOT_SLIPPERY,  "Castle Roof"},    // MB64_MAT_C_ROOF
-    {mat_maker_MakerSnowRoof,  0, SURFACE_VERY_SLIPPERY, "Blue Roof"},      // MB64_MAT_SNOW_ROOF
-    {mat_maker_MakerBBHWindow, 0, SURFACE_DEFAULT,       "Window"},         // MB64_MAT_BBH_WINDOW
-    {mat_maker_MakerHLight,    0, SURFACE_DEFAULT,       "Lantern"},        // MB64_MAT_HMC_LIGHT
-    {mat_maker_MakerCaution,   0, SURFACE_DEFAULT,       "Hazard Stripes"}, // MB64_MAT_VP_CAUTION
-    {mat_maker_MakerRRBlocks,  0, SURFACE_DEFAULT,       "Rainbow Blocks"},  // MB64_MAT_RR_BLOCKS
-    {mat_maker_MakerStuddedFloor, 0, SURFACE_NOT_SLIPPERY, "Studded Tile"},  // MB64_MAT_STUDDED_TILE
-    {mat_maker_MakerYellowBlock, 0, SURFACE_DEFAULT,     "Yellow Block"},   // MB64_MAT_TTC_BLOCK
-    {mat_maker_MakerTTCSide,   0, SURFACE_DEFAULT,       "Clock Platform"}, // MB64_MAT_TTC_SIDE
-    {mat_maker_MakerTTCWall,   0, SURFACE_DEFAULT,       "Clock Exterior"}, // MB64_MAT_TTC_WALL
-    {mat_maker_MakerFlowerTop, 0, SURFACE_GRASS,         "Flowers"},        // MB64_MAT_FLOWERS
+    {mat_maker_MakerCCarpet,      MAT_OPAQUE, FALSE, SURFACE_GRASS,         "Carpet"},         // MB64_MAT_C_CARPET
+    {mat_maker_MakerCWall,        MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,       "Castle Wall"},    // MB64_MAT_C_WALL
+    {mat_maker_MakerRoof,         MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY,  "Roof"},           // MB64_MAT_ROOF
+    {mat_maker_MakerCRoof,        MAT_OPAQUE, TRUE,  SURFACE_NOT_SLIPPERY,  "Castle Roof"},    // MB64_MAT_C_ROOF
+    {mat_maker_MakerSnowRoof,     MAT_OPAQUE, TRUE,  SURFACE_VERY_SLIPPERY, "Blue Roof"},      // MB64_MAT_SNOW_ROOF
+    {mat_maker_MakerBBHWindow,    MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,       "Window"},         // MB64_MAT_BBH_WINDOW
+    {mat_maker_MakerHLight,       MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,       "Lantern"},        // MB64_MAT_HMC_LIGHT
+    {mat_maker_MakerCaution,      MAT_OPAQUE, FALSE, SURFACE_DEFAULT,       "Hazard Stripes"}, // MB64_MAT_VP_CAUTION
+    {mat_maker_MakerRRBlocks,     MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,       "Rainbow Blocks"},  // MB64_MAT_RR_BLOCKS
+    {mat_maker_MakerStuddedFloor, MAT_OPAQUE, FALSE, SURFACE_NOT_SLIPPERY, "Studded Tile"},  // MB64_MAT_STUDDED_TILE
+    {mat_maker_MakerYellowBlock,  MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,     "Yellow Block"},   // MB64_MAT_TTC_BLOCK
+    {mat_maker_MakerTTCSide,      MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,       "Clock Platform"}, // MB64_MAT_TTC_SIDE
+    {mat_maker_MakerTTCWall,      MAT_OPAQUE, TRUE,  SURFACE_DEFAULT,       "Clock Exterior"}, // MB64_MAT_TTC_WALL
+    {mat_maker_MakerFlowerTop,    MAT_OPAQUE, FALSE, SURFACE_GRASS,         "Flowers"},        // MB64_MAT_FLOWERS
 
     // Hazards
-    {mat_maker_MakerLava,       0, SURFACE_BURNING_BUBBLES,   "Lava"},           // MB64_MAT_LAVA
-    {mat_maker_MakerVanillaLava, 0, SURFACE_BURNING_BUBBLES,  "Lava (Old)"},     // MB64_MAT_LAVA_OLD
-    {mat_maker_MakerServerAcid, 0, SURFACE_BURNING_ICE,       "Server Acid"},    // MB64_MAT_SERVER_ACID
-    {mat_maker_MakerBurningIce, 0, SURFACE_BURNING_ICE,       "Hazard Ice"},     // MB64_MAT_BURNING_ICE
-    {mat_maker_MakerQuicksand,  0, SURFACE_INSTANT_QUICKSAND, "Quicksand"},      // MB64_MAT_QUICKSAND
-    {mat_maker_MakerSlowsand,   0, SURFACE_DEEP_QUICKSAND,    "Slow Quicksand"}, // MB64_MAT_DESERT_SLOWSAND
-    {mat_maker_MakerVoid,       0, SURFACE_INSTANT_QUICKSAND, "Void"},           // MB64_MAT_VP_VOID
+    {mat_maker_MakerLava,        MAT_OPAQUE, TRUE,  SURFACE_BURNING_BUBBLES,   "Lava"},           // MB64_MAT_LAVA
+    {mat_maker_MakerVanillaLava, MAT_OPAQUE, TRUE,  SURFACE_BURNING_BUBBLES,  "Lava (Old)"},     // MB64_MAT_LAVA_OLD
+    {mat_maker_MakerServerAcid,  MAT_OPAQUE, TRUE,  SURFACE_BURNING_ICE,       "Server Acid"},    // MB64_MAT_SERVER_ACID
+    {mat_maker_MakerBurningIce,  MAT_OPAQUE, TRUE,  SURFACE_BURNING_ICE,       "Hazard Ice"},     // MB64_MAT_BURNING_ICE
+    {mat_maker_MakerQuicksand,   MAT_OPAQUE, TRUE,  SURFACE_INSTANT_QUICKSAND, "Quicksand"},      // MB64_MAT_QUICKSAND
+    {mat_maker_MakerSlowsand,    MAT_OPAQUE, FALSE, SURFACE_DEEP_QUICKSAND,    "Slow Quicksand"}, // MB64_MAT_DESERT_SLOWSAND
+    {mat_maker_MakerVoid,        MAT_OPAQUE, TRUE,  SURFACE_INSTANT_QUICKSAND, "Cosmic Void"},           // MB64_MAT_VP_VOID
 
     // Seethrough
-    {mat_maker_MakerRHRMesh, MAT_CUTOUT,      SURFACE_HANGABLE_MESH, "Mesh"},         // MB64_MAT_RHR_MESH
-    {mat_maker_MakerVPMesh,  MAT_CUTOUT,      SURFACE_HANGABLE_MESH, "Fine Mesh"},    // MB64_MAT_VP_MESH
-    {mat_maker_MakerHMesh,   MAT_CUTOUT,      SURFACE_HANGABLE_MESH, "Red Grille"},   // MB64_MAT_HMC_MESH
-    {mat_maker_MakerBBHMesh, MAT_CUTOUT,      SURFACE_HANGABLE_MESH, "Red Mesh"},     // MB64_MAT_BBH_MESH
-    {mat_maker_MakerGratePink, MAT_CUTOUT,    SURFACE_HANGABLE_MESH, "Pink Mesh"},    // MB64_MAT_PINK_MESH
-    {mat_maker_MakerTTCGrate, MAT_CUTOUT,     SURFACE_HANGABLE_MESH, "Clock Grille"}, // MB64_MAT_TTC_MESH
-    {mat_maker_MakerIce,     MAT_TRANSPARENT, SURFACE_ICE,           "Ice"},          // MB64_MAT_ICE
-    {mat_maker_MakerCrystal, MAT_TRANSPARENT, SURFACE_CRYSTAL,       "Crystal"},      // MB64_MAT_CRYSTAL
-    {mat_maker_MakerScreen,  MAT_DECAL,       SURFACE_DEFAULT,       "Screen"},       // MB64_MAT_VP_SCREEN
+    {mat_maker_MakerRHRMesh, MAT_CUTOUT,      TRUE,  SURFACE_HANGABLE_MESH, "Mesh"},         // MB64_MAT_RHR_MESH
+    {mat_maker_MakerVPMesh,  MAT_CUTOUT,      TRUE,  SURFACE_HANGABLE_MESH, "Fine Mesh"},    // MB64_MAT_VP_MESH
+    {mat_maker_MakerHMesh,   MAT_CUTOUT,      TRUE,  SURFACE_HANGABLE_MESH, "Red Grille"},   // MB64_MAT_HMC_MESH
+    {mat_maker_MakerBBHMesh, MAT_CUTOUT,      TRUE,  SURFACE_HANGABLE_MESH, "Red Mesh"},     // MB64_MAT_BBH_MESH
+    {mat_maker_MakerGratePink, MAT_CUTOUT,    TRUE,  SURFACE_HANGABLE_MESH, "Pink Mesh"},    // MB64_MAT_PINK_MESH
+    {mat_maker_MakerTTCGrate, MAT_CUTOUT,     TRUE,  SURFACE_HANGABLE_MESH, "Clock Grille"}, // MB64_MAT_TTC_MESH
+    {mat_maker_MakerIce,     MAT_TRANSPARENT, FALSE, SURFACE_ICE,           "Ice"},          // MB64_MAT_ICE
+    {mat_maker_MakerCrystal, MAT_TRANSPARENT, FALSE, SURFACE_CRYSTAL,       "Crystal"},      // MB64_MAT_CRYSTAL
+    {mat_maker_MakerScreen,  MAT_DECAL,       TRUE,  SURFACE_DEFAULT,       "Screen"},       // MB64_MAT_VP_SCREEN
 
     // Retro
-    {mat_maker_MakerRetroGround,     0, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_GROUND
-    {mat_maker_MakerRetroBrick,      0, SURFACE_DEFAULT,      NULL}, // MB64_MAT_RETRO_BRICKS
-    {mat_maker_MakerRetroTreeTop,    0, SURFACE_GRASS,        NULL}, // MB64_MAT_RETRO_TREETOP
-    {mat_maker_MakerRetroTree,       0, SURFACE_DEFAULT,      NULL}, // MB64_MAT_RETRO_TREEPLAT
-    {mat_maker_MakerRetroBlock,      0, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_BLOCK
-    {mat_maker_MakerRetroBGround,    0, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_BLUEGROUND
-    {mat_maker_MakerRetroBBrick,     0, SURFACE_DEFAULT,      NULL}, // MB64_MAT_RETRO_BLUEBRICKS
-    {mat_maker_MakerRetroBBlock,     0, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_BLUEBLOCK
-    {mat_maker_MakerRetroWBrick,     0, SURFACE_DEFAULT,      NULL}, // MB64_MAT_RETRO_WHITEBRICK
-    {mat_maker_MakerRetroLava,       0, SURFACE_BURNING,      NULL}, // MB64_MAT_RETRO_LAVA
-    {mat_maker_MakerRetroUnderwater, 0, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_UNDERWATERGROUND
+    {mat_maker_MakerRetroGround,     MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_GROUND
+    {mat_maker_MakerRetroBrick,      MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      NULL}, // MB64_MAT_RETRO_BRICKS
+    {mat_maker_MakerRetroTreeTop,    MAT_OPAQUE, TRUE, SURFACE_GRASS,        NULL}, // MB64_MAT_RETRO_TREETOP
+    {mat_maker_MakerRetroTree,       MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      NULL}, // MB64_MAT_RETRO_TREEPLAT
+    {mat_maker_MakerRetroBlock,      MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_BLOCK
+    {mat_maker_MakerRetroBGround,    MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_BLUEGROUND
+    {mat_maker_MakerRetroBBrick,     MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      NULL}, // MB64_MAT_RETRO_BLUEBRICKS
+    {mat_maker_MakerRetroBBlock,     MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_BLUEBLOCK
+    {mat_maker_MakerRetroWBrick,     MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      NULL}, // MB64_MAT_RETRO_WHITEBRICK
+    {mat_maker_MakerRetroLava,       MAT_OPAQUE, TRUE, SURFACE_BURNING,      NULL}, // MB64_MAT_RETRO_LAVA
+    {mat_maker_MakerRetroUnderwater, MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_RETRO_UNDERWATERGROUND
 
     // Minecraft
-    {mat_maker_MakerMCDirt,        0, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_MC_DIRT
-    {mat_maker_MakerMCGrassTop,    0, SURFACE_GRASS,        NULL}, // MB64_MAT_MC_GRASS
-    {mat_maker_MakerMCCobblestone, 0, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_MC_COBBLESTONE
-    {mat_maker_MakerMCStone,       0, SURFACE_DEFAULT,      NULL}, // MB64_MAT_MC_STONE
-    {mat_maker_MakerMCOakLogTop,   0, SURFACE_CREAKWOOD,    NULL}, // MB64_MAT_MC_OAK_LOG_TOP
-    {mat_maker_MakerMCOakLogSide,  0, SURFACE_CREAKWOOD,    NULL}, // MB64_MAT_MC_OAK_LOG_SIDE
-    {mat_maker_MakerMCOakLeaves,   MAT_CUTOUT,        SURFACE_GRASS,            NULL}, // MB64_MAT_MC_OAK_LEAVES
-    {mat_maker_MakerMCWoodPlanks,  0, SURFACE_CREAKWOOD,    NULL}, // MB64_MAT_MC_WOOD_PLANKS
-    {mat_maker_MakerMCSand,        0, SURFACE_SAND,         NULL}, // MB64_MAT_MC_SAND
-    {mat_maker_MakerMCBricks,      0, SURFACE_DEFAULT,      NULL}, // MB64_MAT_MC_BRICKS
-    {mat_maker_MakerMCLava,        0, SURFACE_BURNING,      NULL}, // MB64_MAT_MC_LAVA
-    {mat_maker_MakerMCFlowingLava, 0, SURFACE_BURNING,      NULL}, // MB64_MAT_MC_FLOWING_LAVA
-    {mat_maker_MakerMCGlass,       MAT_CUTOUT_NOCULL, SURFACE_VANISH_CAP_WALLS, NULL}, // MB64_MAT_MC_GLASS
+    {mat_maker_MakerMCDirt,        MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_MC_DIRT
+    {mat_maker_MakerMCGrassTop,    MAT_OPAQUE, TRUE, SURFACE_GRASS,        NULL}, // MB64_MAT_MC_GRASS
+    {mat_maker_MakerMCCobblestone, MAT_OPAQUE, TRUE, SURFACE_NOT_SLIPPERY, NULL}, // MB64_MAT_MC_COBBLESTONE
+    {mat_maker_MakerMCStone,       MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      NULL}, // MB64_MAT_MC_STONE
+    {mat_maker_MakerMCOakLogTop,   MAT_OPAQUE, TRUE, SURFACE_CREAKWOOD,    NULL}, // MB64_MAT_MC_OAK_LOG_TOP
+    {mat_maker_MakerMCOakLogSide,  MAT_OPAQUE, TRUE, SURFACE_CREAKWOOD,    NULL}, // MB64_MAT_MC_OAK_LOG_SIDE
+    {mat_maker_MakerMCOakLeaves,   MAT_CUTOUT, TRUE, SURFACE_GRASS,        NULL}, // MB64_MAT_MC_OAK_LEAVES
+    {mat_maker_MakerMCWoodPlanks,  MAT_OPAQUE, TRUE, SURFACE_CREAKWOOD,    NULL}, // MB64_MAT_MC_WOOD_PLANKS
+    {mat_maker_MakerMCSand,        MAT_OPAQUE, TRUE, SURFACE_SAND,         NULL}, // MB64_MAT_MC_SAND
+    {mat_maker_MakerMCBricks,      MAT_OPAQUE, TRUE, SURFACE_DEFAULT,      NULL}, // MB64_MAT_MC_BRICKS
+    {mat_maker_MakerMCLava,        MAT_OPAQUE, TRUE, SURFACE_BURNING,      NULL}, // MB64_MAT_MC_LAVA
+    {mat_maker_MakerMCFlowingLava, MAT_OPAQUE, TRUE, SURFACE_BURNING,      NULL}, // MB64_MAT_MC_FLOWING_LAVA
+    {mat_maker_MakerMCGlass,       MAT_CUTOUT_NOCULL, TRUE, SURFACE_VANISH_CAP_WALLS, NULL}, // MB64_MAT_MC_GLASS
 };
 
 u32 mb64_render_mode_table[] = {
@@ -1187,7 +1193,7 @@ struct mb64_theme mb64_theme_table[] = {
             {MB64_MAT_VP_CAUTION,    MB64_MAT_VP_CAUTION,    "Hazard Stripes"},
             {MB64_MAT_VP_BLOCK,      MB64_MAT_SNOW,          "Snowy Block"},
             {MB64_MAT_LAVA,          MB64_MAT_LAVA,          "Lava"},
-            {MB64_MAT_VP_VOID,       MB64_MAT_VP_VOID,       "Void"},
+            {MB64_MAT_VP_VOID,       MB64_MAT_VP_VOID,       "Cosmic Void"},
         },
         MB64_FENCE_VIRTUAPLEX, MB64_MAT_VP_CAUTION, MB64_BAR_VP, MB64_WATER_DEFAULT
     },
@@ -1456,97 +1462,97 @@ enum {
 struct mb64_object_info mb64_object_type_list[] = {
 /* OBJECT_TYPE_SETTINGS */      {"Level Settings",          mat_b_btn_settings},
 /* OBJECT_TYPE_SCREENSHOT */    {"Take Screenshot",         mat_b_btn_camera},
-/* OBJECT_TYPE_STAR */          {"Normal",                  mat_b_btn_star,         bhvStar,           TILE_SIZE/2, MODEL_STAR,                OBJ_TYPE_HAS_STAR,       0, 0, 1.0f, NULL, df_star, SOUND_MENU_STAR_SOUND | SOUND_VIBRATO},
-/* OBJECT_TYPE_RED_COIN_STAR */ {"Red Coins",               mat_b_btn_rcs,          bhvHiddenRedCoinStar, TILE_SIZE/2, MODEL_TRANSPARENT_STAR, OBJ_TYPE_HAS_STAR,       0, 1, 1.0f, NULL, df_reds_marker, SOUND_MENU_STAR_SOUND | SOUND_VIBRATO},
-/* OBJECT_TYPE_GOOMBA */        {"Normal",                  mat_b_btn_goomba,       bhvGoomba,         0,           MODEL_GOOMBA,              0,                       1, 0, 1.5f, goomba_seg8_anims_0801DA4C, NULL, SOUND_OBJ_GOOMBA_PREVIEW},
-/* OBJECT_TYPE_BIG_GOOMBA */    {"Huge",                    mat_b_btn_goomba_b,     bhvBigGoomba,      0,           MODEL_GOOMBA,              0,                       5, 0, 3.5f, goomba_seg8_anims_0801DA4C, NULL, SOUND_OBJ_GOOMBA_PREVIEW},
-/* OBJECT_TYPE_TINY_GOOMBA */   {"Tiny",                    mat_b_btn_goomba_s,     bhvTinyGoomba,     0,           MODEL_GOOMBA,              0,                       1, 0, 0.5f, goomba_seg8_anims_0801DA4C, NULL, SOUND_OBJ_GOOMBA_PREVIEW},
-/* OBJECT_TYPE_PIRANHA_PLANT */ {"Normal",                  mat_b_btn_plant,        bhvPiranhaPlant,   0,           MODEL_MAKER_PLANT,         0,                       5, 0, 1.0f, piranha_plant_seg6_anims_0601C31C, NULL, SOUND_OBJ2_PIRANHA_PLANT_BITE},
-/* OBJECT_TYPE_BIG_PIRANHA_PLANT */  {"Huge",               mat_b_btn_plant_b,      bhvFirePiranhaPlantBig, 0,      MODEL_MAKER_PLANT,         0,                       2, 0, 2.0f, piranha_plant_seg6_anims_0601C31C, NULL, SOUND_OBJ2_PIRANHA_PLANT_BITE},
-/* OBJECT_TYPE_TINY_PIRANHA_PLANT */ {"Tiny",               mat_b_btn_plant_s,      bhvFirePiranhaPlant, 0,         MODEL_MAKER_PLANT,         0,                       1, 0, 0.5f, piranha_plant_seg6_anims_0601C31C, NULL, SOUND_OBJ2_PIRANHA_PLANT_BITE},
-/* OBJECT_TYPE_KOOPA */         {"Koopa",                   mat_b_btn_kuppa,        bhvScaredKoopa,    0,           MODEL_KOOPA_WITH_SHELL,    0,                       5, 0, 1.5f, koopa_seg6_anims_06011364, df_koopa, SOUND_OBJ_KOOPA_TALK},
-/* OBJECT_TYPE_COIN */          {"Yellow Coin",             mat_b_btn_coin,         bhvYellowCoin,     0,           MODEL_YELLOW_COIN,         OBJ_TYPE_IS_BILLBOARDED, 1, 0, 1.0f, NULL, NULL, SOUND_GENERAL_COIN | SOUND_VIBRATO},
-/* OBJECT_TYPE_GREEN_COIN */    {"Green Coin",              mat_b_btn_greencoin,    bhvGreenCoin,      0,           MODEL_GREEN_COIN,          OBJ_TYPE_IS_BILLBOARDED, 3, 0, 1.0f, NULL, NULL, SOUND_GENERAL_COIN_MULTI},
-/* OBJECT_TYPE_RED_COIN */      {"Red Coin",                mat_b_btn_redcoin,      bhvRedCoin,        0,           MODEL_RED_COIN,            OBJ_TYPE_IS_BILLBOARDED, 2, 0, 1.0f, NULL, NULL, SOUND_MENU_COLLECT_RED_COIN},
-/* OBJECT_TYPE_BLUE_COIN */     {"Coin",                    mat_b_btn_bluecoin,     bhvHiddenBlueCoin, 0,           MODEL_BLUE_COIN,           OBJ_TYPE_IS_BILLBOARDED, 5, 0, 1.0f, NULL, NULL, SOUND_GENERAL_COIN_MULTI},
-/* OBJECT_TYPE_BLUE_COIN_SWITCH */ {"Switch",               mat_b_btn_bcs,          bhvBlueCoinSwitch, 0,           MODEL_BLUE_COIN_SWITCH,    0,                       0, 0, 3.0f, NULL, NULL, SOUND_GENERAL2_PURPLE_SWITCH},
-/* OBJECT_TYPE_NOTEBLOCK */     {"Noteblock",               mat_b_btn_noteblock,    bhvNoteblock,      TILE_SIZE/2, MODEL_NOTEBLOCK,           0,                       0, 0, 1.28f,NULL, NULL, SOUND_GENERAL_CRAZY_BOX_BOING_SLOW},
-/* OBJECT_TYPE_BOBOMB */        {"Bob-omb",                 mat_b_btn_bobomb,       bhvBobomb,         0,           MODEL_BLACK_BOBOMB,        0,                       1, 0, 1.0f, bobomb_anims, NULL, SOUND_GENERAL2_QUIET_EXPLOSION},
-/* OBJECT_TYPE_CHUCKYA */       {"Chuckya",                 mat_b_btn_chuckya,      bhvChuckya,        0,           MODEL_CHUCKYA,             0,                       5, 0, 2.0f, chuckya_seg8_anims_0800C070, df_chuckya, SOUND_OBJ_CHUCKYA_PREVIEW},
-/* OBJECT_TYPE_BULLY */         {"Bully",                   mat_b_btn_bully,        bhvSmallBully,     0,           MODEL_BULLY,               0,                       1, 0, 1.0f, bully_seg5_anims_0500470C, NULL, SOUND_OBJ2_SMALL_BULLY_ATTACKED},
-/* OBJECT_TYPE_CHILL_BULLY */   {"Chill Bully",             mat_b_btn_chillbully,   bhvSmallBully,     0,           MODEL_CHILL_BULLY,         0,                       1, 0, 1.0f, bully_seg5_anims_0500470C, NULL, SOUND_OBJ2_SMALL_BULLY_ATTACKED},
-/* OBJECT_TYPE_BULLET_BILL */   {"Bullet Bill",             mat_b_btn_bill,         bhvBulletBillCannon, TILE_SIZE/2, MODEL_BILL_MAKER_2,      0,                       0, 1, 1.0f, NULL, NULL, SOUND_OBJ_POUNDING_CANNON},
-/* OBJECT_TYPE_HEAVE_HO */      {"Heave-Ho",                mat_b_btn_heaveho,      bhvHeaveHo,        0,           MODEL_MAKER_HEAVEHO,       0,                       0, 0, 2.0f, heave_ho_seg5_anims_0501534C, NULL, SOUND_OBJ_HEAVEHO_PREVIEW},
-/* OBJECT_TYPE_MOTOS */         {"Motos",                   mat_b_btn_motos,        bhvMotos,          0,           MODEL_MAKER_MOTOS,         0,                       5, 0, 2.0f, motos_anime, NULL, SOUND_OBJ_HEAVEHO_PREVIEW},
-/* OBJECT_TYPE_TREE */          {"Tree",                    mat_b_btn_tree,         bhvTree,           0,           MODEL_MAKER_TREE_1,        OBJ_TYPE_IS_BILLBOARDED, 0, 0, 1.0f, NULL, df_tree, SOUND_ACTION_CLIMB_UP_TREE | SOUND_VIBRATO},
-/* OBJECT_TYPE_EXCL_BOX */      {"Item Box",                mat_b_btn_excla,        bhvExclamationBox, TILE_SIZE/2, MODEL_EXCLAMATION_BOX,     0,                       0, 0, 2.0f, NULL, df_exbox, SOUND_GENERAL_BOX_PREVIEW},
-/* OBJECT_TYPE_SPAWN */         {"Mario Spawn",             mat_b_btn_spawn,        bhvSpawn,          TILE_SIZE/2, MODEL_SPAWN,               0,                       0, 0, 1.0f, NULL, NULL, SOUND_MENU_STAR_SOUND_LETS_A_GO},
-/* OBJECT_TYPE_REX */           {"Rex",                     mat_b_btn_rex,          bhvRex,            0,           MODEL_REX,                 0,                       2, 0, 1.5f, Rex_anims, NULL, SOUND_OBJ_GOOMBA_PREVIEW},
-/* OBJECT_TYPE_PODOBOO */       {"Podoboo",                 mat_b_btn_podoboo,      bhvPodoboo,        TILE_SIZE/2, MODEL_PODOBOO,             0,                       0, 0, 1.0f, NULL, df_podoboo, SOUND_OBJ_FLAME_BLOWN},
-/* OBJECT_TYPE_CRABLET */       {"Crablet",                 mat_b_btn_crablet,      bhvCrablet,        0,           MODEL_MAKER_CRABLET,       0,                       4, 0, 1.0f, crab_anims_anims, NULL, SOUND_OBJ2_SCUTTLEBUG_ALERT},
-/* OBJECT_TYPE_HAMMER_BRO */    {"Normal",                  mat_b_btn_hammerbro,    bhvHammerBro,      60.0f,       MODEL_HAMMER_BRO,          0,                       6, 0, 1.0f, Hammerbro_anims, df_hammerbro, SOUND_OBJ_KOOPA_DAMAGE},
-/* OBJECT_TYPE_FIRE_BRO */      {"Fire Bro",                mat_b_btn_firebro,      bhvFireBro,        60.0f,       MODEL_HAMMER_BRO,          0,                       6, 0, 1.0f, Hammerbro_anims, df_firebro, SOUND_OBJ_KOOPA_DAMAGE},
-/* OBJECT_TYPE_CHICKEN */       {"Chicken",                 mat_b_btn_chicken,      bhvChicken,        0,           MODEL_MAKER_CHICKEN,       0,                       2, 0, 1.0f, chicken_anims, NULL, SOUND_OBJ_BOO_LAUGH_SHORT},
-/* OBJECT_TYPE_PHANTASM */      {"Cosmic Phantasm",         mat_b_btn_phantasm,     bhvPhantasm,       0,           MODEL_MARIO,               0,                       5, 0, 1.0f, &evil_mario_anims[2], NULL, SOUND_ACTION_METAL_STEP | SOUND_VIBRATO},
-/* OBJECT_TYPE_WARP_PIPE */     {"Warp Pipe",               mat_b_btn_pipe,         bhvStaticObject,   0,           MODEL_MAKER_PIPE,          0,                       0, 0, 1.0f, NULL, NULL, SOUND_MENU_ENTER_PIPE | SOUND_VIBRATO},
-/* OBJECT_TYPE_BADGE */         {"Badge",                   mat_b_btn_badge,        bhvBadge,          TILE_SIZE/2, MODEL_BADGE,               OBJ_TYPE_IS_BILLBOARDED, 0, 0, 5.0f, NULL, NULL, SOUND_GENERAL2_PURPLE_SWITCH},
-/* OBJECT_TYPE_KING_BOBOMB */   {"King Bob-omb",            mat_b_btn_boss_kb,      bhvKingBobomb,     0,           MODEL_KINGBOMB_MAKER,      OBJ_TYPE_IMBUABLE,       0, 0, 1.0f, king_bobomb_seg5_anims_0500FE30, df_kingbomb, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO},
-/* OBJECT_TYPE_KING_WHOMP */    {"King Whomp",              mat_b_btn_boss_whomp,   bhvWhompKingBoss,  0,           MODEL_WHOMP_MAKER,         OBJ_TYPE_IMBUABLE,       0, 0, 2.0f, whomp_seg6_anims_06020A04, NULL, SOUND_OBJ_WHOMP},
-/* OBJECT_TYPE_BIG_BOO */       {"Big Boo",                 mat_b_btn_boss_boo,     bhvBalconyBigBoo,  TILE_SIZE,   MODEL_MAKER_BOO,           OBJ_TYPE_IMBUABLE,       0, 0, 3.0f, NULL, df_boo, SOUND_OBJ_BOO_LAUGH_LONG},
-/* OBJECT_TYPE_BIG_BULLY */     {"Big Bully",               mat_b_btn_boss_bully,   bhvBigBully,       0,           MODEL_BULLY,               OBJ_TYPE_IMBUABLE,       0, 0, 2.0f, bully_seg5_anims_0500470C, NULL, SOUND_OBJ2_LARGE_BULLY_ATTACKED},
-/* OBJECT_TYPE_BIG_CHILL_BULLY */ {"Big Chill Bully",       mat_b_btn_boss_chillbully,bhvBigBully,     0,           MODEL_CHILL_BULLY,         OBJ_TYPE_IMBUABLE,       0, 0, 2.0f, bully_seg5_anims_0500470C, NULL, SOUND_OBJ2_LARGE_BULLY_ATTACKED},
-/* OBJECT_TYPE_WIGGLER */       {"Wiggler",                 mat_b_btn_boss_wiggler, bhvWigglerHead,    0,           MODEL_WIGGLER_HEAD,        OBJ_TYPE_IMBUABLE,       0, 0, 4.0f, wiggler_seg5_anims_0500EC8C, df_wiggler, SOUND_OBJ_WIGGLER_TALK},
-/* OBJECT_TYPE_BOWSER */        {"Bowser",                  mat_b_btn_boss_bowser,  bhvBowser,         0,           MODEL_MAKER_BOWSER,        OBJ_TYPE_IMBUABLE,       0, 3, 1.0f, bowser_anims, df_booser, SOUND_OBJ2_BOWSER_ROAR},
-/* OBJECT_TYPE_PLATFORM_TRACK */ {"Activated",              mat_b_btn_checker,      bhvPlatformOnTrack, TILE_SIZE/2, MODEL_CHECKERBOARD_PLATFORM, OBJ_TYPE_TRAJECTORY,  0, 0, 1.0f, NULL, NULL, SOUND_ENV_ELEVATOR1 | SOUND_VIBRATO},
-/* OBJECT_TYPE_PLATFORM_LOOPING */ {"Looping",              mat_b_btn_checker,      bhvLoopingPlatform, TILE_SIZE/2, MODEL_LOOPINGP,           OBJ_TYPE_TRAJECTORY,     0, 0, 1.0f, NULL, NULL, SOUND_ENV_ELEVATOR1 | SOUND_VIBRATO},
-/* OBJECT_TYPE_BOWLING_BALL */  {"Bowling Ball",            mat_b_btn_bball,        bhvBobBowlingBallSpawner, TILE_SIZE/2, MODEL_BOWLING_BALL, OBJ_TYPE_IS_BILLBOARDED | OBJ_TYPE_TRAJECTORY, 0, 0, 1.0f, NULL, NULL, SOUND_GENERAL_QUIET_POUND1 | SOUND_VIBRATO},
-/* OBJECT_TYPE_KOOPA_THE_QUICK */ {"Koopa the Quick",       mat_b_btn_kuppaq,       bhvKoopa,          0,           MODEL_KOOPA_WITH_SHELL,    OBJ_TYPE_TRAJECTORY | OBJ_TYPE_HAS_STAR, 0, 1, 3.0f, koopa_seg6_anims_06011364, df_ktq, SOUND_OBJ_KOOPA_TALK},
-/* OBJECT_TYPE_PURPLE_SWITCH */ {"Purple Switch",           mat_b_btn_purpleswitch, bhvFloorSwitchHiddenObjects, 0, MODEL_PURPLE_SWITCH,       0,                       0, 0, 1.28f,NULL, NULL, SOUND_GENERAL2_PURPLE_SWITCH},
-/* OBJECT_TYPE_TIMED_BOX */     {"Timed Box",               mat_b_btn_tbox,         bhvHiddenObject,   0,           MODEL_BREAKABLE_BOX,       0,                       0, 0, 1.0f, NULL, df_timedbox, SOUND_GENERAL2_SWITCH_TICK_FAST},
-/* OBJECT_TYPE_RECOVERY_HEART */ {"Recovery Heart",         mat_b_btn_heart,        bhvRecoveryHeart,  TILE_SIZE/2, MODEL_HEART,               0,                       0, 0, 1.0f, NULL, df_heart, SOUND_GENERAL_HEART_SPIN},
-/* OBJECT_TYPE_TEST_MARIO */    {"Save & Test",             mat_b_btn_check,        NULL,              0,           MODEL_MARIO,               0,                       0, 0, 1.0f, &evil_mario_anims[11], NULL, 0},
-/* OBJECT_TYPE_THWOMP */        {"Thwomp",                  mat_b_btn_thwomp,       bhvThwomp,         0,           MODEL_THWOMP_MAKER,        0,                       0, 0, 1.5f, NULL, NULL, SOUND_OBJ_THWOMP},
-/* OBJECT_TYPE_WHOMP */         {"Whomp",                   mat_b_btn_whomp,        bhvSmallWhomp,     0,           MODEL_WHOMP_MAKER,         0,                      10, 0, 1.0f, whomp_seg6_anims_06020A04, NULL, SOUND_OBJ_WHOMP},
-/* OBJECT_TYPE_GRINDEL */       {"Grindel",                 mat_b_btn_grindel,      bhvGrindel,        0,           MODEL_MAKER_GRINDEL,       0,                       0, 0, 1.0f, NULL, df_grindel, SOUND_OBJ_KING_BOBOMB_JUMP},
-/* OBJECT_TYPE_LAKITU */        {"Lakitu",                  mat_b_btn_lakitu,       bhvEnemyLakitu,    TILE_SIZE/2, MODEL_LAKITU_MAKER,        0,                       5, 5, 1.0f, lakitu_enemy_seg5_anims_050144D4, df_lakitu, SOUND_OBJ_EVIL_LAKITU_THROW},
-/* OBJECT_TYPE_FLY_GUY */       {"Fly Guy",                 mat_b_btn_flyguy,       bhvRealFlyGuy,     TILE_SIZE/2, MODEL_FLYGUY,              0,                       2, 0, 1.5f, flyguy_seg8_anims_08011A64, df_flyguy, SOUND_OBJ_KOOPA_FLYGUY_DEATH},
-/* OBJECT_TYPE_SNUFIT */        {"Snufit",                  mat_b_btn_snufit,       bhvSnufit,         TILE_SIZE/2, MODEL_MAKER_SNUFIT,        0,                       2, 0, 1.0f, NULL, df_snufit, SOUND_OBJ_SNUFIT_SHOOT},
-/* OBJECT_TYPE_AMP */           {"Amp",                     mat_b_btn_amp,          bhvCirclingAmp,    TILE_SIZE/2, MODEL_AMP,                 0,                       0, 0, 1.0f, amp_anims, df_circling_amp, SOUND_AIR_AMP_PREVIEW},
-/* OBJECT_TYPE_BOO */           {"Boo",                     mat_b_btn_boo,          bhvBoo,            TILE_SIZE/2, MODEL_MAKER_BOO,           0,                       1, 0, 1.0f, NULL, df_boo, SOUND_OBJ_BOO_LAUGH_LONG},
-/* OBJECT_TYPE_MR_I */          {"Mr. I",                   mat_b_btn_mri,          bhvMrI,            0,           MODEL_MAKER_MRI,           OBJ_TYPE_IS_BILLBOARDED, 5, 1, 1.0f, NULL, df_mri, SOUND_OBJ_MRI_SHOOT},
-/* OBJECT_TYPE_SCUTTLEBUG */    {"Scuttlebug",              mat_b_btn_scuttlebug,   bhvScuttlebug,     0,           MODEL_MAKER_SCUTTLEBUG,    0,                       3, 0, 1.0f, scuttlebug_seg6_anims_06015064, NULL, SOUND_OBJ2_SCUTTLEBUG_ALERT},
-/* OBJECT_TYPE_BOWSER_BOMB */   {"Bowser Bomb",             mat_b_btn_bbomb,        bhvBowserBomb,     TILE_SIZE/2, MODEL_MAKER_BOWSER_BOMB,   0,                       0, 0, 1.0f, NULL, NULL, SOUND_GENERAL2_QUIET_EXPLOSION},
-/* OBJECT_TYPE_FIRE_SPINNER */  {"Fire Spinner",            mat_b_btn_firebar,      bhvLllRotatingBlockWithFireBars, 0, MODEL_MAKER_FIREBAR,   0,                       0, 0, 1.0f, NULL, df_fire_spinner, SOUND_OBJ_FLAME_BLOWN},
-/* OBJECT_TYPE_COIN_FORMATION */ {"Coin Formation",         mat_b_btn_cformation,   bhvCoinFormation,  0,           MODEL_NONE,                0,                       0, 0, 1.0f, NULL, df_coin_formation, SOUND_GENERAL_COIN_MULTI},
-/* OBJECT_TYPE_RED_FLAME */     {"Red",                     mat_b_btn_fire_red,     bhvFlame,          60,          MODEL_RED_FLAME,           OBJ_TYPE_IS_BILLBOARDED, 0, 0, 7.0f, NULL, df_flame, SOUND_OBJ_FLAME_BLOWN},
-/* OBJECT_TYPE_BLUE_FLAME */    {"Blue",                    mat_b_btn_fire_blue,    bhvFlame,          60,          MODEL_BLUE_FLAME,          OBJ_TYPE_IS_BILLBOARDED, 0, 0, 7.0f, NULL, df_flame, SOUND_OBJ_FLAME_BLOWN},
-/* OBJECT_TYPE_FIRE_SPITTER */  {"Fire Spitter",            mat_b_btn_firespitter,  bhvFireSpitter,    TILE_SIZE/2, MODEL_BOWLING_BALL,        OBJ_TYPE_IS_BILLBOARDED, 0, 0, 0.2f, NULL, NULL, SOUND_OBJ_FLAME_BLOWN},
-/* OBJECT_TYPE_FLAMETHROWER */  {"Flamethrower",            mat_b_btn_flamethrower, bhvFlamethrower,   TILE_SIZE/2, MODEL_MAKER_FLAMETHROWER,  0,                       0, 0, 1.0f, NULL, NULL, SOUND_OBJ_FLAME_BLOWN},
-/* OBJECT_TYPE_SPINDRIFT */     {"Spindrift",               mat_b_btn_spindrift,    bhvSpindrift,      0,           MODEL_MAKER_SPINDRIFT,     0,                       3, 0, 1.0f, spindrift_seg5_anims_05002D68, NULL, SOUND_ACTION_TWIRL},
-/* OBJECT_TYPE_MR_BLIZZARD */   {"Mr. Blizzard",            mat_b_btn_blizzard,     bhvMrBlizzard,     0,           MODEL_MAKER_BLIZZARD,      0,                       3, 0, 1.0f, snowman_seg5_anims_0500D118, df_blizzard, SOUND_OBJ2_SCUTTLEBUG_ALERT},
-/* OBJECT_TYPE_MONEYBAG */      {"Moneybag",                mat_b_btn_moneybag,     bhvMoneybagHidden, 0,           MODEL_MONEYBAG,            0,                       5, 0, 1.0f, moneybag_seg6_anims_06005E5C, df_moneybag, SOUND_GENERAL_MONEYBAG_BOING_LOWPRIO},
-/* OBJECT_TYPE_SKEETER */       {"Skeeter",                 mat_b_btn_skeeter,      bhvSkeeter,        0,           MODEL_MAKER_SKEETER,       0,                       3, 0, 1.0f, skeeter_seg6_anims_06007DE0, NULL, SOUND_OBJ_SKEETER_WALK},
-/* OBJECT_TYPE_POKEY */         {"Pokey",                   mat_b_btn_pokey,        bhvPokey,          0,           MODEL_MAKER_POKEY_HEAD,    OBJ_TYPE_IS_BILLBOARDED, 5, 0, 3.0f, NULL, df_pokey, SOUND_OBJ_POKEY_DEATH},
-/* OBJECT_TYPE_BBOX_SMALL*/     {"Throwable Box",           mat_b_btn_sbox,         bhvBreakableBoxSmall, 0,        MODEL_BREAKABLE_BOX,       0,                       3, 0, 0.31f,NULL, df_corkbox, SOUND_GENERAL_BOX_PREVIEW},
-/* OBJECT_TYPE_BBOX_NORMAL*/    {"Breakable Box",           mat_b_btn_corkbox,      bhvBreakableBox,   0,           MODEL_BREAKABLE_BOX,       OBJ_TYPE_IMBUABLE | OBJ_TYPE_IMBUABLE_COINS,       0, 0, 1.0f, NULL, df_corkbox, SOUND_GENERAL_BOX_PREVIEW},
-/* OBJECT_TYPE_BBOX_CRAZY*/     {"Crazy Box",               mat_b_btn_cbox,         bhvJumpingBox,     0,           MODEL_BREAKABLE_BOX,       0,                       5, 0, 0.38f,NULL, NULL, SOUND_GENERAL_CRAZY_BOX_BOING_SLOW},
-/* OBJECT_TYPE_DIAMOND*/        {"Water Diamond",           mat_b_btn_water_diamond,bhvWaterLevelDiamond,0,         MODEL_MAKER_DIAMOND,       0,                       0, 0, 1.0f, NULL, NULL, SOUND_GENERAL_WATER_LEVEL_TRIG},
-/* OBJECT_TYPE_SIGN */          {"Bill Board",              mat_b_btn_sign,         bhvMessagePanel,   0,           MODEL_WOODEN_SIGNPOST,     OBJ_TYPE_HAS_DIALOG,     0, 0, 1.0f, NULL, NULL, SOUND_ACTION_READ_SIGN},
-/* OBJECT_TYPE_BUDDY */         {"Bob-omb Buddy",           mat_b_btn_buddy,        bhvBobombBuddy,    0,           MODEL_BOBOMB_BUDDY,        OBJ_TYPE_HAS_DIALOG,     0, 0, 1.0f, bobomb_anims, NULL, SOUND_OBJ_BOBOMB_BUDDY_TALK},
-/* OBJECT_TYPE_BUTTON */        {"On-Off Button",           mat_b_btn_switch,       bhvOnOffButton,    0,           MODEL_MAKER_BUTTON,        0,                       0, 0, 1.0f, NULL, df_button, SOUND_GENERAL_BUTTON_PRESS},
-/* OBJECT_TYPE_ON_OFF_BLOCK */  {"On-Off Block",            mat_b_btn_block,        bhvOnOffBlock,     0,           MODEL_MAKER_BLOCK_ON,      0,                       0, 0, 1.0f, NULL, df_block, SOUND_GENERAL_BUTTON_PRESS},
-/* OBJECT_TYPE_WOODPLAT */      {"Wooden Platform",         mat_b_btn_woodplat,     bhvWoodPlat,       0,           MODEL_MAKER_WOODPLAT,      0,                       0, 1, 1.0f, NULL, df_woodplat, SOUND_ACTION_TERRAIN_STEP + (SOUND_TERRAIN_SPOOKY << 16)},
-/* OBJECT_TYPE_RFBOX */         {"Reinforced Box",          mat_b_btn_rfbox,        bhvBreakableBoxRF, 0,           MODEL_MAKER_RFBOX,         OBJ_TYPE_IMBUABLE | OBJ_TYPE_IMBUABLE_COINS,       0, 0, 1.0f, NULL, NULL, SOUND_OBJ_BULLY_METAL},
-/* OBJECT_TYPE_CULL_PREVIEW */  {"",                        mat_b_btn_cull,         bhvStaticObject,   TILE_SIZE/2, MODEL_CULL_MARKER,         OBJ_TYPE_IS_BILLBOARDED, 0, 0, 1.f,  NULL, NULL, 0},
-/* OBJECT_TYPE_SHOWRUNNER */    {"Showrunner",              mat_b_btn_showrunner,   bhvShowrunner,     0,           MODEL_MAKER_SHOWRUNNER,    OBJ_TYPE_IMBUABLE,       50,50,1.0f, showrunner_anims, NULL, SOUND_OBJ_MRI_SHOOT},
-/* OBJECT_TYPE_CROWBAR */       {"Crowbar",                 mat_b_btn_pipebar,      bhvCrowbarPower,   0,           MODEL_MAKER_CROWBAR,       0,                       0, 0, 1.0f, NULL, df_power, SOUND_MENU_EXIT_PIPE},
-/* OBJECT_TYPE_MASK    */       {"Bullet Bill Mask",        mat_b_btn_mask,         bhvBMask,          0,           MODEL_MAKER_MASK,          0,                       0, 0, 1.0f, NULL, df_power, SOUND_MENU_EXIT_PIPE},
-/* OBJECT_TYPE_TOAD */          {"Toad",                    mat_b_btn_toad,         bhvMakerToad,      0,           MODEL_MAKER_TOAD,          OBJ_TYPE_HAS_DIALOG,     0, 0, 1.0f, toad_seg6_anims_0600FB58, df_toad, SOUND_ACTION_READ_SIGN},
-/* OBJECT_TYPE_TUXIE */         {"Tuxie",                   mat_b_btn_tuxie,        bhvMakerTuxie,     0,           MODEL_MAKER_TUXIE,         OBJ_TYPE_HAS_DIALOG,     0, 0, 1.0f, penguin_seg5_anims_05008B74, NULL, SOUND_OBJ2_BABY_PENGUIN_YELL},
-/* OBJECT_TYPE_UKIKI */         {"Ukiki",                   mat_b_btn_ukiki,        bhvMakerUkiki,     0,           MODEL_MAKER_UKIKI,         OBJ_TYPE_HAS_DIALOG,     0, 0, 1.0f, ukiki_seg5_anims_05015784, df_ukiki, SOUND_OBJ_UKIKI_CHATTER_SHORT},
-/* OBJECT_TYPE_MOLEMAN */       {"Moleman",                 mat_b_btn_moleman,      bhvMoleman,        65,          MODEL_MAKER_MOLEMAN,       OBJ_TYPE_HAS_DIALOG,     0, 0, 1.0f, moleman3_anims, NULL, SOUND_ACTION_READ_SIGN},
-/* OBJECT_TYPE_COBIE */         {"Cobie",                   mat_b_btn_cobie,        bhvCobie,          0,           MODEL_MAKER_COBIE,         OBJ_TYPE_HAS_DIALOG,     0, 0, 1.0f, cobie2_anims, NULL, SOUND_ACTION_READ_SIGN},
-/* OBJECT_TYPE_CONVEYOR */      {"Conveyor",                mat_b_btn_conveyor,     bhvConveyor,       0,           MODEL_MAKER_CONVEYOR_HALF, 0,                       0, 0, 1.0f, NULL, df_conveyor, SOUND_OBJ_HEAVEHO_PREVIEW},
+/* OBJECT_TYPE_STAR */          {"Normal",                  mat_b_btn_star,         bhvStar,           TILE_SIZE/2, MODEL_STAR,                OBJ_TYPE_HAS_STAR,       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_star, SOUND_MENU_STAR_SOUND | SOUND_VIBRATO},
+/* OBJECT_TYPE_RED_COIN_STAR */ {"Red Coins",               mat_b_btn_rcs,          bhvHiddenRedCoinStar, TILE_SIZE/2, MODEL_TRANSPARENT_STAR, OBJ_TYPE_HAS_STAR,       OBJ_OCCUPY_INNER, 0, 1, 1.0f, NULL, df_reds_marker, SOUND_MENU_STAR_SOUND | SOUND_VIBRATO},
+/* OBJECT_TYPE_GOOMBA */        {"Normal",                  mat_b_btn_goomba,       bhvGoomba,         0,           MODEL_GOOMBA,              OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 1, 0, 1.5f, goomba_seg8_anims_0801DA4C, NULL, SOUND_OBJ_GOOMBA_PREVIEW},
+/* OBJECT_TYPE_BIG_GOOMBA */    {"Huge",                    mat_b_btn_goomba_b,     bhvBigGoomba,      0,           MODEL_GOOMBA,              OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 5, 0, 3.5f, goomba_seg8_anims_0801DA4C, NULL, SOUND_OBJ_GOOMBA_PREVIEW},
+/* OBJECT_TYPE_TINY_GOOMBA */   {"Tiny",                    mat_b_btn_goomba_s,     bhvTinyGoomba,     0,           MODEL_GOOMBA,              OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 1, 0, 0.5f, goomba_seg8_anims_0801DA4C, NULL, SOUND_OBJ_GOOMBA_PREVIEW},
+/* OBJECT_TYPE_PIRANHA_PLANT */ {"Normal",                  mat_b_btn_plant,        bhvPiranhaPlant,   0,           MODEL_MAKER_PLANT,         OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 5, 0, 1.0f, piranha_plant_seg6_anims_0601C31C, NULL, SOUND_OBJ2_PIRANHA_PLANT_BITE},
+/* OBJECT_TYPE_BIG_PIRANHA_PLANT */  {"Huge",               mat_b_btn_plant_b,      bhvFirePiranhaPlantBig, 0,      MODEL_MAKER_PLANT,         OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 2, 0, 2.0f, piranha_plant_seg6_anims_0601C31C, NULL, SOUND_OBJ2_PIRANHA_PLANT_BITE},
+/* OBJECT_TYPE_TINY_PIRANHA_PLANT */ {"Tiny",               mat_b_btn_plant_s,      bhvFirePiranhaPlant, 0,         MODEL_MAKER_PLANT,         OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 1, 0, 0.5f, piranha_plant_seg6_anims_0601C31C, NULL, SOUND_OBJ2_PIRANHA_PLANT_BITE},
+/* OBJECT_TYPE_KOOPA */         {"Koopa",                   mat_b_btn_kuppa,        bhvScaredKoopa,    0,           MODEL_KOOPA_WITH_SHELL,    OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 5, 0, 1.5f, koopa_seg6_anims_06011364, df_koopa, SOUND_OBJ_KOOPA_TALK},
+/* OBJECT_TYPE_COIN */          {"Yellow Coin",             mat_b_btn_coin,         bhvYellowCoin,     0,           MODEL_YELLOW_COIN,         OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 1, 0, 1.0f, NULL, NULL, SOUND_GENERAL_COIN | SOUND_VIBRATO},
+/* OBJECT_TYPE_GREEN_COIN */    {"Green Coin",              mat_b_btn_greencoin,    bhvGreenCoin,      0,           MODEL_GREEN_COIN,          OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 3, 0, 1.0f, NULL, NULL, SOUND_GENERAL_COIN_MULTI},
+/* OBJECT_TYPE_RED_COIN */      {"Red Coin",                mat_b_btn_redcoin,      bhvRedCoin,        0,           MODEL_RED_COIN,            OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 2, 0, 1.0f, NULL, NULL, SOUND_MENU_COLLECT_RED_COIN},
+/* OBJECT_TYPE_BLUE_COIN */     {"Coin",                    mat_b_btn_bluecoin,     bhvHiddenBlueCoin, 0,           MODEL_BLUE_COIN,           OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 5, 0, 1.0f, NULL, NULL, SOUND_GENERAL_COIN_MULTI},
+/* OBJECT_TYPE_BLUE_COIN_SWITCH */ {"Switch",               mat_b_btn_bcs,          bhvBlueCoinSwitch, 0,           MODEL_BLUE_COIN_SWITCH,    0,                       OBJ_OCCUPY_INNER, 0, 0, 3.0f, NULL, NULL, SOUND_GENERAL2_PURPLE_SWITCH},
+/* OBJECT_TYPE_NOTEBLOCK */     {"Noteblock",               mat_b_btn_noteblock,    bhvNoteblock,      TILE_SIZE/2, MODEL_NOTEBLOCK,           0,                       OBJ_OCCUPY_INNER, 0, 0, 1.27f,NULL, NULL, SOUND_GENERAL_CRAZY_BOX_BOING_SLOW},
+/* OBJECT_TYPE_BOBOMB */        {"Bob-omb",                 mat_b_btn_bobomb,       bhvBobomb,         0,           MODEL_BLACK_BOBOMB,        OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 1, 0, 1.0f, bobomb_anims, NULL, SOUND_GENERAL2_QUIET_EXPLOSION},
+/* OBJECT_TYPE_CHUCKYA */       {"Chuckya",                 mat_b_btn_chuckya,      bhvChuckya,        0,           MODEL_CHUCKYA,             OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 5, 0, 2.0f, chuckya_seg8_anims_0800C070, df_chuckya, SOUND_OBJ_CHUCKYA_PREVIEW},
+/* OBJECT_TYPE_BULLY */         {"Bully",                   mat_b_btn_bully,        bhvSmallBully,     0,           MODEL_BULLY,               OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 1, 0, 1.0f, bully_seg5_anims_0500470C, NULL, SOUND_OBJ2_SMALL_BULLY_ATTACKED},
+/* OBJECT_TYPE_CHILL_BULLY */   {"Chill Bully",             mat_b_btn_chillbully,   bhvSmallBully,     0,           MODEL_CHILL_BULLY,         OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 1, 0, 1.0f, bully_seg5_anims_0500470C, NULL, SOUND_OBJ2_SMALL_BULLY_ATTACKED},
+/* OBJECT_TYPE_BULLET_BILL */   {"Bullet Bill",             mat_b_btn_bill,         bhvBulletBillCannon, TILE_SIZE/2, MODEL_BILL_MAKER_2,      0,                       OBJ_OCCUPY_INNER, 0, 1, 1.0f, NULL, NULL, SOUND_OBJ_POUNDING_CANNON},
+/* OBJECT_TYPE_HEAVE_HO */      {"Heave-Ho",                mat_b_btn_heaveho,      bhvHeaveHo,        0,           MODEL_MAKER_HEAVEHO,       OBJ_TYPE_IMBUABLE | OBJ_TYPE_IMBUABLE_COINS, OBJ_OCCUPY_INNER, 0, 0, 2.0f, heave_ho_seg5_anims_0501534C, NULL, SOUND_OBJ_HEAVEHO_PREVIEW},
+/* OBJECT_TYPE_MOTOS */         {"Motos",                   mat_b_btn_motos,        bhvMotos,          0,           MODEL_MAKER_MOTOS,         OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 5, 0, 2.0f, motos_anime, NULL, SOUND_OBJ_HEAVEHO_PREVIEW},
+/* OBJECT_TYPE_TREE */          {"Tree",                    mat_b_btn_tree,         bhvTree,           0,           MODEL_MAKER_TREE_1,        OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_tree, SOUND_ACTION_CLIMB_UP_TREE | SOUND_VIBRATO},
+/* OBJECT_TYPE_EXCL_BOX */      {"Item Box",                mat_b_btn_excla,        bhvExclamationBox, TILE_SIZE/2, MODEL_EXCLAMATION_BOX,     0,                       OBJ_OCCUPY_INNER, 0, 0, 2.0f, NULL, df_exbox, SOUND_GENERAL_BOX_PREVIEW},
+/* OBJECT_TYPE_SPAWN */         {"Mario Spawn",             mat_b_btn_spawn,        bhvSpawn,          TILE_SIZE/2, MODEL_SPAWN,               0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, NULL, SOUND_MENU_STAR_SOUND_LETS_A_GO},
+/* OBJECT_TYPE_REX */           {"Rex",                     mat_b_btn_rex,          bhvRex,            0,           MODEL_REX,                 OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 2, 0, 1.5f, Rex_anims, NULL, SOUND_OBJ_GOOMBA_PREVIEW},
+/* OBJECT_TYPE_PODOBOO */       {"Podoboo",                 mat_b_btn_podoboo,      bhvPodoboo,        TILE_SIZE/2, MODEL_PODOBOO,             0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_podoboo, SOUND_OBJ_FLAME_BLOWN},
+/* OBJECT_TYPE_CRABLET */       {"Crablet",                 mat_b_btn_crablet,      bhvCrablet,        0,           MODEL_MAKER_CRABLET,       OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 4, 0, 1.0f, crab_anims_anims, NULL, SOUND_OBJ2_SCUTTLEBUG_ALERT},
+/* OBJECT_TYPE_HAMMER_BRO */    {"Normal",                  mat_b_btn_hammerbro,    bhvHammerBro,      0,           MODEL_HAMMER_BRO,          OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 6, 0, 1.0f, Hammerbro_anims, df_hammerbro, SOUND_OBJ_KOOPA_DAMAGE},
+/* OBJECT_TYPE_FIRE_BRO */      {"Fire Bro",                mat_b_btn_firebro,      bhvFireBro,        0,           MODEL_HAMMER_BRO,          OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 6, 0, 1.0f, Hammerbro_anims, df_firebro, SOUND_OBJ_KOOPA_DAMAGE},
+/* OBJECT_TYPE_CHICKEN */       {"Chicken",                 mat_b_btn_chicken,      bhvChicken,        TILE_SIZE/2, MODEL_MAKER_CHICKEN,       OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 2, 0, 1.0f, chicken_anims, NULL, SOUND_OBJ_BOO_LAUGH_SHORT},
+/* OBJECT_TYPE_PHANTASM */      {"Cosmic Phantasm",         mat_b_btn_phantasm,     bhvPhantasm,       0,           MODEL_MARIO,               OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 5, 9, 1.0f, &evil_mario_anims[2], NULL, SOUND_ACTION_METAL_STEP | SOUND_VIBRATO},
+/* OBJECT_TYPE_WARP_PIPE */     {"Warp Pipe",               mat_b_btn_pipe,         bhvStaticObject,   0,           MODEL_MAKER_PIPE,          0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, NULL, SOUND_MENU_ENTER_PIPE | SOUND_VIBRATO},
+/* OBJECT_TYPE_BADGE */         {"Badge",                   mat_b_btn_badge,        bhvBadge,          TILE_SIZE/2, MODEL_BADGE,               OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 0, 0, 5.0f, NULL, NULL, SOUND_GENERAL2_PURPLE_SWITCH},
+/* OBJECT_TYPE_KING_BOBOMB */   {"King Bob-omb",            mat_b_btn_boss_kb,      bhvKingBobomb,     0,           MODEL_KINGBOMB_MAKER,      OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_FULL,  0, 0, 1.0f, king_bobomb_seg5_anims_0500FE30, df_kingbomb, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO},
+/* OBJECT_TYPE_KING_WHOMP */    {"King Whomp",              mat_b_btn_boss_whomp,   bhvWhompKingBoss,  0,           MODEL_WHOMP_MAKER,         OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_FULL,  0, 0, 2.0f, whomp_seg6_anims_06020A04, NULL, SOUND_OBJ_WHOMP},
+/* OBJECT_TYPE_BIG_BOO */       {"Big Boo",                 mat_b_btn_boss_boo,     bhvBalconyBigBoo,  TILE_SIZE,   MODEL_MAKER_BOO,           OBJ_TYPE_IMBUABLE | OBJ_TYPE_IMBUABLE_COINS,       OBJ_OCCUPY_FULL,  0, 0, 3.0f, NULL, df_boo, SOUND_OBJ_BOO_LAUGH_LONG},
+/* OBJECT_TYPE_BIG_BULLY */     {"Big Bully",               mat_b_btn_boss_bully,   bhvBigBully,       0,           MODEL_BULLY,               OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_FULL,  0, 0, 2.0f, bully_seg5_anims_0500470C, NULL, SOUND_OBJ2_LARGE_BULLY_ATTACKED},
+/* OBJECT_TYPE_BIG_CHILL_BULLY */ {"Big Chill Bully",       mat_b_btn_boss_chillbully,bhvBigBully,     0,           MODEL_CHILL_BULLY,         OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_FULL,  0, 0, 2.0f, bully_seg5_anims_0500470C, NULL, SOUND_OBJ2_LARGE_BULLY_ATTACKED},
+/* OBJECT_TYPE_WIGGLER */       {"Wiggler",                 mat_b_btn_boss_wiggler, bhvWigglerHead,    0,           MODEL_WIGGLER_HEAD,        OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_FULL,  0, 5, 4.0f, wiggler_seg5_anims_0500EC8C, df_wiggler, SOUND_OBJ_WIGGLER_TALK},
+/* OBJECT_TYPE_BOWSER */        {"Bowser",                  mat_b_btn_boss_bowser,  bhvBowser,         0,           MODEL_MAKER_BOWSER,        OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_FULL,  0, 24, 1.0f, bowser_anims, df_booser, SOUND_OBJ2_BOWSER_ROAR},
+/* OBJECT_TYPE_PLATFORM_TRACK */ {"Activated",              mat_b_btn_checker,      bhvPlatformOnTrack, TILE_SIZE/2, MODEL_CHECKERBOARD_PLATFORM, OBJ_TYPE_TRAJECTORY,  OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, NULL, SOUND_ENV_ELEVATOR1 | SOUND_VIBRATO},
+/* OBJECT_TYPE_PLATFORM_LOOPING */ {"Looping",              mat_b_btn_checker,      bhvLoopingPlatform, TILE_SIZE/2, MODEL_LOOPINGP,           OBJ_TYPE_TRAJECTORY,     OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, NULL, SOUND_ENV_ELEVATOR1 | SOUND_VIBRATO},
+/* OBJECT_TYPE_BOWLING_BALL */  {"Bowling Ball",            mat_b_btn_bball,        bhvBobBowlingBallSpawner, TILE_SIZE/2, MODEL_BOWLING_BALL, OBJ_TYPE_IS_BILLBOARDED | OBJ_TYPE_TRAJECTORY, OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, NULL, SOUND_GENERAL_QUIET_POUND1 | SOUND_VIBRATO},
+/* OBJECT_TYPE_KOOPA_THE_QUICK */ {"Koopa the Quick",       mat_b_btn_kuppaq,       bhvKoopa,          0,           MODEL_KOOPA_WITH_SHELL,    OBJ_TYPE_TRAJECTORY | OBJ_TYPE_HAS_STAR, OBJ_OCCUPY_FULL, 0, 1, 3.0f, koopa_seg6_anims_06011364, df_ktq, SOUND_OBJ_KOOPA_TALK},
+/* OBJECT_TYPE_PURPLE_SWITCH */ {"Purple Switch",           mat_b_btn_purpleswitch, bhvFloorSwitchHiddenObjects, 0, MODEL_PURPLE_SWITCH,       0,                       OBJ_OCCUPY_INNER, 0, 0, 1.28f,NULL, NULL, SOUND_GENERAL2_PURPLE_SWITCH},
+/* OBJECT_TYPE_TIMED_BOX */     {"Timed Box",               mat_b_btn_tbox,         bhvHiddenObject,   0,           MODEL_BREAKABLE_BOX,       0,                       OBJ_OCCUPY_OUTER, 0, 0, 1.0f, NULL, df_timedbox, SOUND_GENERAL2_SWITCH_TICK_FAST},
+/* OBJECT_TYPE_RECOVERY_HEART */ {"Recovery Heart",         mat_b_btn_heart,        bhvRecoveryHeart,  TILE_SIZE/2, MODEL_HEART,               0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_heart, SOUND_GENERAL_HEART_SPIN},
+/* OBJECT_TYPE_TEST_MARIO */    {"Save & Test",             mat_b_btn_check,        NULL,              0,           MODEL_MARIO,               0,                       OBJ_OCCUPY_FULL,  0, 0, 1.0f, &evil_mario_anims[11], NULL, 0},
+/* OBJECT_TYPE_THWOMP */        {"Thwomp",                  mat_b_btn_thwomp,       bhvThwomp,         0,           MODEL_THWOMP_MAKER,        0,                       OBJ_OCCUPY_FULL,  0, 0, 1.5f, NULL, NULL, SOUND_OBJ_THWOMP},
+/* OBJECT_TYPE_WHOMP */         {"Whomp",                   mat_b_btn_whomp,        bhvSmallWhomp,     0,           MODEL_WHOMP_MAKER,         OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_FULL, 10, 0, 1.0f, whomp_seg6_anims_06020A04, NULL, SOUND_OBJ_WHOMP},
+/* OBJECT_TYPE_GRINDEL */       {"Grindel",                 mat_b_btn_grindel,      bhvGrindel,        0,           MODEL_MAKER_GRINDEL,       0,                       OBJ_OCCUPY_FULL,  0, 0, 1.0f, NULL, df_grindel, SOUND_OBJ_KING_BOBOMB_JUMP},
+/* OBJECT_TYPE_LAKITU */        {"Lakitu",                  mat_b_btn_lakitu,       bhvEnemyLakitu,    TILE_SIZE/2, MODEL_LAKITU_MAKER,        OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 5, 5, 1.0f, lakitu_enemy_seg5_anims_050144D4, df_lakitu, SOUND_OBJ_EVIL_LAKITU_THROW},
+/* OBJECT_TYPE_FLY_GUY */       {"Fly Guy",                 mat_b_btn_flyguy,       bhvRealFlyGuy,     TILE_SIZE/2, MODEL_FLYGUY,              OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 2, 0, 1.5f, flyguy_seg8_anims_08011A64, df_flyguy, SOUND_OBJ_KOOPA_FLYGUY_DEATH},
+/* OBJECT_TYPE_SNUFIT */        {"Snufit",                  mat_b_btn_snufit,       bhvSnufit,         TILE_SIZE/2, MODEL_MAKER_SNUFIT,        OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 2, 0, 1.0f, NULL, df_snufit, SOUND_OBJ_SNUFIT_SHOOT},
+/* OBJECT_TYPE_AMP */           {"Amp",                     mat_b_btn_amp,          bhvCirclingAmp,    TILE_SIZE/2, MODEL_AMP,                 0,                       OBJ_OCCUPY_OUTER, 0, 0, 1.0f, amp_anims, df_circling_amp, SOUND_AIR_AMP_PREVIEW},
+/* OBJECT_TYPE_BOO */           {"Boo",                     mat_b_btn_boo,          bhvBoo,            TILE_SIZE/2, MODEL_MAKER_BOO,           OBJ_TYPE_IMBUABLE | OBJ_TYPE_IMBUABLE_COINS,  OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_boo, SOUND_OBJ_BOO_LAUGH_LONG},
+/* OBJECT_TYPE_MR_I */          {"Mr. I",                   mat_b_btn_mri,          bhvMrI,            0,           MODEL_MAKER_MRI,           OBJ_TYPE_IMBUABLE | OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 5, 1, 1.0f, NULL, df_mri, SOUND_OBJ_MRI_SHOOT},
+/* OBJECT_TYPE_SCUTTLEBUG */    {"Scuttlebug",              mat_b_btn_scuttlebug,   bhvScuttlebug,     0,           MODEL_MAKER_SCUTTLEBUG,    OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 3, 0, 1.0f, scuttlebug_seg6_anims_06015064, NULL, SOUND_OBJ2_SCUTTLEBUG_ALERT},
+/* OBJECT_TYPE_BOWSER_BOMB */   {"Bowser Bomb",             mat_b_btn_bbomb,        bhvBowserBomb,     TILE_SIZE/2, MODEL_MAKER_BOWSER_BOMB,   0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, NULL, SOUND_GENERAL2_QUIET_EXPLOSION},
+/* OBJECT_TYPE_FIRE_SPINNER */  {"Fire Spinner",            mat_b_btn_firebar,      bhvLllRotatingBlockWithFireBars, 0, MODEL_MAKER_FIREBAR,   0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_fire_spinner, SOUND_OBJ_FLAME_BLOWN},
+/* OBJECT_TYPE_COIN_FORMATION */ {"Coin Formation",         mat_b_btn_cformation,   bhvCoinFormation,  0,           MODEL_NONE,                0,                       OBJ_OCCUPY_FULL,  0, 0, 1.0f, NULL, df_coin_formation, SOUND_GENERAL_COIN_MULTI},
+/* OBJECT_TYPE_RED_FLAME */     {"Red",                     mat_b_btn_fire_red,     bhvFlame,          60,          MODEL_RED_FLAME,           OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 0, 0, 7.0f, NULL, df_flame, SOUND_OBJ_FLAME_BLOWN},
+/* OBJECT_TYPE_BLUE_FLAME */    {"Blue",                    mat_b_btn_fire_blue,    bhvFlame,          60,          MODEL_BLUE_FLAME,          OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 0, 0, 7.0f, NULL, df_flame, SOUND_OBJ_FLAME_BLOWN},
+/* OBJECT_TYPE_FIRE_SPITTER */  {"Fire Spitter",            mat_b_btn_firespitter,  bhvFireSpitter,    TILE_SIZE/2, MODEL_BOWLING_BALL,        OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 0, 0, 0.2f, NULL, NULL, SOUND_OBJ_FLAME_BLOWN},
+/* OBJECT_TYPE_FLAMETHROWER */  {"Flamethrower",            mat_b_btn_flamethrower, bhvFlamethrower,   TILE_SIZE/2, MODEL_MAKER_FLAMETHROWER,  0,                       OBJ_OCCUPY_FULL,  0, 10, 1.0f, NULL, NULL, SOUND_OBJ_FLAME_BLOWN},
+/* OBJECT_TYPE_SPINDRIFT */     {"Spindrift",               mat_b_btn_spindrift,    bhvSpindrift,      0,           MODEL_MAKER_SPINDRIFT,     OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 3, 0, 1.0f, spindrift_seg5_anims_05002D68, NULL, SOUND_ACTION_TWIRL},
+/* OBJECT_TYPE_MR_BLIZZARD */   {"Mr. Blizzard",            mat_b_btn_blizzard,     bhvMrBlizzard,     0,           MODEL_MAKER_BLIZZARD,      OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 3, 0, 1.0f, snowman_seg5_anims_0500D118, df_blizzard, SOUND_OBJ2_SCUTTLEBUG_ALERT},
+/* OBJECT_TYPE_MONEYBAG */      {"Moneybag",                mat_b_btn_moneybag,     bhvMoneybagHidden, 0,           MODEL_MONEYBAG,            OBJ_TYPE_IMBUABLE | OBJ_TYPE_IMBUABLE_COINS, OBJ_OCCUPY_INNER, 0, 1, 1.0f, moneybag_seg6_anims_06005E5C, df_moneybag, SOUND_GENERAL_MONEYBAG_BOING_LOWPRIO},
+/* OBJECT_TYPE_SKEETER */       {"Skeeter",                 mat_b_btn_skeeter,      bhvSkeeter,        0,           MODEL_MAKER_SKEETER,       OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_INNER, 3, 0, 1.0f, skeeter_seg6_anims_06007DE0, NULL, SOUND_OBJ_SKEETER_WALK},
+/* OBJECT_TYPE_POKEY */         {"Pokey",                   mat_b_btn_pokey,        bhvPokey,          0,           MODEL_MAKER_POKEY_HEAD,    OBJ_TYPE_IMBUABLE | OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 5, 5, 3.0f, NULL, df_pokey, SOUND_OBJ_POKEY_DEATH},
+/* OBJECT_TYPE_BBOX_SMALL*/     {"Throwable Box",           mat_b_btn_sbox,         bhvBreakableBoxSmall, 0,        MODEL_BREAKABLE_BOX,       0,                       OBJ_OCCUPY_INNER, 3, 0, 0.31f,NULL, df_corkbox, SOUND_GENERAL_BOX_PREVIEW},
+/* OBJECT_TYPE_BBOX_NORMAL*/    {"Breakable Box",           mat_b_btn_corkbox,      bhvBreakableBox,   0,           MODEL_BREAKABLE_BOX,       OBJ_TYPE_IMBUABLE | OBJ_TYPE_IMBUABLE_COINS, OBJ_OCCUPY_FULL, 0, 0, 1.0f, NULL, df_corkbox, SOUND_GENERAL_BOX_PREVIEW},
+/* OBJECT_TYPE_BBOX_CRAZY*/     {"Crazy Box",               mat_b_btn_cbox,         bhvJumpingBox,     0,           MODEL_BREAKABLE_BOX,       0,                       OBJ_OCCUPY_INNER, 5, 0, 0.38f,NULL, NULL, SOUND_GENERAL_CRAZY_BOX_BOING_SLOW},
+/* OBJECT_TYPE_DIAMOND*/        {"Water Diamond",           mat_b_btn_water_diamond,bhvWaterLevelDiamond,0,         MODEL_MAKER_DIAMOND,       0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, NULL, SOUND_GENERAL_WATER_LEVEL_TRIG},
+/* OBJECT_TYPE_SIGN */          {"Bill Board",              mat_b_btn_sign,         bhvMessagePanel,   0,           MODEL_WOODEN_SIGNPOST,     OBJ_TYPE_HAS_DIALOG,     OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, NULL, SOUND_ACTION_READ_SIGN},
+/* OBJECT_TYPE_BUDDY */         {"Bob-omb Buddy",           mat_b_btn_buddy,        bhvBobombBuddy,    0,           MODEL_BOBOMB_BUDDY,        OBJ_TYPE_HAS_DIALOG,     OBJ_OCCUPY_INNER, 0, 0, 1.0f, bobomb_anims, NULL, SOUND_OBJ_BOBOMB_BUDDY_TALK},
+/* OBJECT_TYPE_BUTTON */        {"On-Off Button",           mat_b_btn_switch,       bhvOnOffButton,    0,           MODEL_MAKER_BUTTON,        0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_button, SOUND_GENERAL_BUTTON_PRESS},
+/* OBJECT_TYPE_ON_OFF_BLOCK */  {"On-Off Block",            mat_b_btn_block,        bhvOnOffBlock,     0,           MODEL_MAKER_BLOCK_OFF,     0,                       OBJ_OCCUPY_OUTER, 0, 0, 1.0f, NULL, df_block, SOUND_GENERAL_BUTTON_PRESS},
+/* OBJECT_TYPE_WOODPLAT */      {"Wooden Platform",         mat_b_btn_woodplat,     bhvWoodPlat,       0,           MODEL_MAKER_WOODPLAT,      0,                       OBJ_OCCUPY_FULL,  0, 1, 1.0f, NULL, df_woodplat, SOUND_ACTION_TERRAIN_STEP + (SOUND_TERRAIN_SPOOKY << 16)},
+/* OBJECT_TYPE_RFBOX */         {"Reinforced Box",          mat_b_btn_rfbox,        bhvBreakableBoxRF, 0,           MODEL_MAKER_RFBOX,         OBJ_TYPE_IMBUABLE | OBJ_TYPE_IMBUABLE_COINS, OBJ_OCCUPY_FULL, 0, 0, 1.0f, NULL, NULL, SOUND_OBJ_BULLY_METAL},
+/* OBJECT_TYPE_CULL_PREVIEW */  {"",                        mat_b_btn_cull,         bhvStaticObject,   TILE_SIZE/2, MODEL_CULL_MARKER,         OBJ_TYPE_IS_BILLBOARDED, OBJ_OCCUPY_INNER, 0, 0, 1.f,  NULL, NULL, 0},
+/* OBJECT_TYPE_SHOWRUNNER */    {"Showrunner",              mat_b_btn_showrunner,   bhvShowrunner,     0,           MODEL_MAKER_SHOWRUNNER,    OBJ_TYPE_IMBUABLE,       OBJ_OCCUPY_FULL,  50,39,1.0f, showrunner_anims, NULL, SOUND_OBJ_MRI_SHOOT},
+/* OBJECT_TYPE_CROWBAR */       {"Crowbar",                 mat_b_btn_pipebar,      bhvCrowbarPower,   0,           MODEL_MAKER_CROWBAR,       0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_power, SOUND_MENU_EXIT_PIPE},
+/* OBJECT_TYPE_MASK    */       {"Bullet Bill Mask",        mat_b_btn_mask,         bhvBMask,          0,           MODEL_MAKER_MASK,          0,                       OBJ_OCCUPY_INNER, 0, 0, 1.0f, NULL, df_power, SOUND_MENU_EXIT_PIPE},
+/* OBJECT_TYPE_TOAD */          {"Toad",                    mat_b_btn_toad,         bhvMakerToad,      0,           MODEL_MAKER_TOAD,          OBJ_TYPE_HAS_DIALOG,     OBJ_OCCUPY_INNER, 0, 0, 1.0f, toad_seg6_anims_0600FB58, df_toad, SOUND_ACTION_READ_SIGN},
+/* OBJECT_TYPE_TUXIE */         {"Tuxie",                   mat_b_btn_tuxie,        bhvMakerTuxie,     0,           MODEL_MAKER_TUXIE,         OBJ_TYPE_HAS_DIALOG,     OBJ_OCCUPY_INNER, 0, 0, 1.0f, penguin_seg5_anims_05008B74, NULL, SOUND_OBJ2_BABY_PENGUIN_YELL},
+/* OBJECT_TYPE_UKIKI */         {"Ukiki",                   mat_b_btn_ukiki,        bhvMakerUkiki,     0,           MODEL_MAKER_UKIKI,         OBJ_TYPE_HAS_DIALOG,     OBJ_OCCUPY_INNER, 0, 0, 1.0f, ukiki_seg5_anims_05015784, df_ukiki, SOUND_OBJ_UKIKI_CHATTER_SHORT},
+/* OBJECT_TYPE_MOLEMAN */       {"Moleman",                 mat_b_btn_moleman,      bhvMoleman,        65,          MODEL_MAKER_MOLEMAN,       OBJ_TYPE_HAS_DIALOG,     OBJ_OCCUPY_INNER, 0, 0, 1.0f, moleman3_anims, NULL, SOUND_ACTION_READ_SIGN},
+/* OBJECT_TYPE_COBIE */         {"Cobie",                   mat_b_btn_cobie,        bhvCobie,          0,           MODEL_MAKER_COBIE,         OBJ_TYPE_HAS_DIALOG,     OBJ_OCCUPY_INNER, 0, 0, 1.0f, cobie2_anims, NULL, SOUND_ACTION_READ_SIGN},
+/* OBJECT_TYPE_CONVEYOR */      {"Conveyor",                mat_b_btn_conveyor,     bhvConveyor,       0,           MODEL_MAKER_CONVEYOR_HALF, 0,                       OBJ_OCCUPY_FULL,  0, 0, 1.0f, NULL, df_conveyor, SOUND_OBJ_HEAVEHO_PREVIEW},
 };
 
 //behparam2 strings
@@ -1636,10 +1642,10 @@ char *txt_conveyor[] = {
     "Full",
     "Upwards",
     "Downwards",
-    "Thin (Toggle)",
-    "Full (Toggle)",
-    "Upwards (Toggle)",
-    "Downwards (Toggle)",
+    "Thin (On-Off)",
+    "Full (On-Off)",
+    "Upwards (On-Off)",
+    "Downwards (On-Off)",
 };
 
 enum {
@@ -2497,20 +2503,22 @@ char *mb64_tips[] = {
     "Tip: You can place objects or tiles inside\n   water blocks to submerge them!",
     "Tip: The thin Iron Meshes can be used to create walls\n   that require a Vanish Cap to pass through.",
     "Tip: Mesh materials can be used as both\n   hangable ceilings and Vanish Cap walls.",
-    "Tip: The maximum number of stars you can place is 63,\n   or 64 if the coin star is enabled.",
-    "Tip: Objects such as coin formations or fire spinners\n   can use up the object limit rather quickly.",
+    "Tip: Objects such as coin formations or bosses\n   can use up the object limit rather quickly.",
     "Tip: The available items inside an Item Box will change\n   depending on the chosen gamemode.",
     "Tip: Thwomps and Grindels will use the height they are\n   placed at as the peak of their movement.",
-    "Tip: The Vertical Slope tile is very useful for making\n   smooth, natural terrain!",
-    "Tip: Cull Markers are very useful for lowering your\n   level's complexity!",
+    "Tip: If you hit the vertex limit, use Cull Markers\n   wherever you can to optimise your level!",
     "Tip: If you want to rename your level, simply rename the\n   .mb64 file itself.",
     "Tip: Entering and exiting water from the side with a shell\n   will let you transition between riding and swimming!",
     "Tip: Entering a famous code while on a certain menu\n   might reward you with a little surprise...",
     "Tip: Transparent materials such as water, flames or ice\n   can look strange when layered together, so watch out.",
     "Tip: Using the Cursed Mirror gamemode will let you use a\n   bunch of new enemies and collectible badges!",
     "Tip: Remember to use the Take Screenshot button to capture\n   a thumbnail before publishing your level!",
-    "Tip: You can place stars and switches inside of\n   bosses or other objects as loot.",
+    "Tip: You can place stars and other objects inside of\n   enemies or breakable boxes as loot!",
+    "Tip: Make sure to place a star or other reward inside\n   any bosses you place, otherwise they'll drop nothing!",
     "Tip: Placing Wooden Platforms on top of each other\n   will cause them to combine into one object.",
+    "Tip: Many objects and enemies can be placed in the\n   same tile as coin rings or On-Off Blocks.",
+    "Tip: On-Off Switches and red coins can be placed\n   inside of enemies to appear when they are killed!",
+    "Tip: The Reinforced Box will not break unless hit by\n a Bob-omb, Bullet Bill, or other destructive object!"
 // BTCM
     "Tip: The Double Time badge extends the timer of\n   hidden corkboxes and blue coin switches!",
     "Tip: The Star Radar badge will let the player know\n   what direction the nearest star is in.",
@@ -2607,7 +2615,7 @@ u8 imbue_coin_amounts[] = {
     /* IMBUE_NONE */ 0,
     /* IMBUE_STAR */ 0,
     /* IMBUE_THREE_COINS */ 3,
-    /* IMBUE_FIVE_COINS */ 5,
+    /* IMBUE_ONE_COIN */ 1,
     /* IMBUE_EIGHT_COINS */ 8,
     /* IMBUE_BLUE_COIN */ 5,
     /* IMBUE_RED_SWITCH */ 0,

@@ -41,6 +41,10 @@ void bhv_motos_hand_loop(void) {
     // Also vert speed increased from 0 to 50
     if (o->oCommonAnchorAction == 1)
         vec3f_copy(gMarioState->pos, gMarioObject->header.gfx.pos); // Added to fix camera
+
+    if (o->parentObj->oAction == MOTOS_ACT_DEATH) {
+        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+    }
 }
 
 void bhv_motos_wait(void) {
@@ -49,7 +53,7 @@ void bhv_motos_wait(void) {
     
     cur_obj_init_animation_with_sound(MOTOS_ANIM_WAIT);
     
-    if (o->oDistanceToMario < 500.f) {
+    if (o->oDistanceToMario < 1000.f) {
         //cur_obj_play_sound_2(SOUND_MOTOS);
         o->oAction = MOTOS_ACT_PLAYER_SEARCH;
     }
@@ -59,6 +63,9 @@ void bhv_motos_player_search(void) {
     cur_obj_init_animation_with_sound(MOTOS_ANIM_WALK);
     o->oForwardVel = 5.f; // Sped up (was 2.f)
     cur_obj_rotate_yaw_toward(o->oAngleToMario, 800); // Sped up (was 300)
+    if (o->oDistanceToMario > 1500.f) {
+        o->oAction = MOTOS_ACT_WAIT;
+    }
 }
 
 void bhv_motos_player_carry(void) {
@@ -127,14 +134,17 @@ void bhv_motos_recover(void) {
 
 void bhv_motos_death(void) {
     cur_obj_init_animation_with_sound(MOTOS_ANIM_WAIT);
+    obj_drop_mario();
     // Taken from bully code to handle death
     if (obj_lava_death()) {
-        struct Object *coin = spawn_object(o, MODEL_BLUE_COIN, bhvBlueCoinMotos);
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT);
-        coin->oForwardVel = 10.0f;
-        coin->oVelY = 100.0f;
-        coin->oPosY = o->oPosY + 310.0f;
-        coin->oMoveAngleYaw = o->oAngleToMario + random_float() * 1024.0f;
+        if (!cur_obj_drop_imbued_object(MB64_STAR_HEIGHT)) {
+            struct Object *coin = spawn_object(o, MODEL_BLUE_COIN, bhvBlueCoinMotos);
+            cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT);
+            coin->oForwardVel = 10.0f;
+            coin->oVelY = 100.0f;
+            coin->oPosY = o->oPosY + 310.0f;
+            coin->oMoveAngleYaw = o->oAngleToMario + random_float() * 1024.0f;
+        }
 
         if (o->prevObj) {
             o->prevObj = NULL;
@@ -148,6 +158,7 @@ void bhv_motos_main() {
     f32 floorY;
 
     cur_obj_update_floor_and_walls();
+    cur_obj_set_home_if_safe();
 
     switch (o->oAction) {
         case MOTOS_ACT_WAIT:
@@ -190,6 +201,9 @@ void bhv_motos_main() {
             o->oAction = MOTOS_ACT_DEATH;
         }
     }
+    if (cur_obj_die_if_on_death_barrier(MB64_STAR_HEIGHT)) {
+        obj_drop_mario();
+    }
 }
 
 void bhv_motos_loop(void) {
@@ -210,6 +224,7 @@ void bhv_motos_loop(void) {
                 bhv_motos_main();
             break;
         case HELD_HELD:
+            cur_obj_set_home_if_safe_held();
             cur_obj_unrender_set_action_and_anim(MOTOS_ANIM_WALK, MOTOS_ACT_WAIT);
             break;
         case HELD_THROWN:

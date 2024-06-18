@@ -455,6 +455,16 @@ static s32 obj_resolve_collisions_and_turn(s16 targetYaw, s16 turnSpeed) {
 
 static void obj_die_if_health_non_positive(void) {
     s8 old_loot_coins = o->oNumLootCoins;
+    s32 starheight = MB64_STAR_HEIGHT;
+    if (o->oImbue == IMBUE_STAR) {
+        if (cur_obj_has_behavior(bhvRealFlyGuy)
+         || cur_obj_has_behavior(bhvEnemyLakitu)) {
+            starheight = 0;
+         } else if (cur_obj_has_behavior(bhvSnufit)) {
+            starheight = MB64_STAR_HEIGHT - 128;
+         }
+        
+    }
 
     if (o->oHealth <= 0) {
         if (o->oDeathSound == 0) {
@@ -465,13 +475,13 @@ static void obj_die_if_health_non_positive(void) {
             spawn_mist_particles();
         }
 
-        if ((s32)o->oNumLootCoins < 0) {
-            spawn_object(o, MODEL_BLUE_COIN, bhvMrIBlueCoin);
-        } else {
-            obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
+        if (!cur_obj_drop_imbued_object(starheight)) {
+            if ((s32)o->oNumLootCoins < 0) {
+                spawn_object(o, MODEL_BLUE_COIN, bhvMrIBlueCoin);
+            } else {
+                obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
+            }
         }
-        // This doesn't do anything
-        obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
 
         if (o->oHealth < 0) {
             cur_obj_hide();
@@ -535,7 +545,7 @@ static s32 obj_die_if_above_lava_and_health_non_positive(void) {
             return FALSE;
         }
     // Check lava
-    } else if (!((o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA)&&(o->oMoveFlags & (OBJ_MOVE_ON_GROUND|OBJ_MOVE_BOUNCE))) ) {
+    } else if (!((o->oMoveFlags & (OBJ_MOVE_ABOVE_LAVA))&&(o->oMoveFlags & (OBJ_MOVE_ON_GROUND|OBJ_MOVE_BOUNCE))) ) {
         return FALSE;
     }
 

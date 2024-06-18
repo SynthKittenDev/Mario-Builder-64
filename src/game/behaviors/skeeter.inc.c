@@ -138,6 +138,7 @@ static void skeeter_act_walk(void) {
 void bhv_skeeter_update(void) {
     o->oDeathSound = SOUND_OBJ_SNUFIT_SKEETER_DEATH;
     cur_obj_update_floor_and_walls();
+    cur_obj_set_home_if_safe();
 
     switch (o->oAction) {
         case SKEETER_ACT_IDLE:
@@ -153,6 +154,7 @@ void bhv_skeeter_update(void) {
 
     obj_check_attacks(&sSkeeterHitbox, o->oAction);
     cur_obj_move_standard(-78);
+    cur_obj_die_if_on_death_barrier(MB64_STAR_HEIGHT);
 }
 
 void bhv_skeeter_wave_update(void) {

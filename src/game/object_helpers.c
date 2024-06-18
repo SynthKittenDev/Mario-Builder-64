@@ -784,6 +784,8 @@ s32 count_red_coins(void) {
     count += count_imbued_red_coins(OBJ_LIST_GENACTOR);
     count += count_imbued_red_coins(OBJ_LIST_SURFACE);
     count += count_imbued_red_coins(OBJ_LIST_POLELIKE);
+    count += count_imbued_red_coins(OBJ_LIST_PUSHABLE);
+    count += count_imbued_red_coins(OBJ_LIST_DESTRUCTIVE);
     return count;
 }
 
@@ -1527,7 +1529,7 @@ s32 cur_obj_resolve_wall_collisions(void) {
     return FALSE;
 }
 
-static void cur_obj_update_floor(void) {
+void cur_obj_update_floor(void) {
     struct Surface *floor = cur_obj_update_floor_height_and_get_floor();
     o->oFloor = floor;
 
@@ -1536,7 +1538,6 @@ static void cur_obj_update_floor(void) {
         o->oFloorType = floorType;
     } else {
         o->oFloorType = SURFACE_DEFAULT;
-        o->oFloorRoom = 0;
     }
 }
 
@@ -1617,7 +1618,7 @@ void cur_obj_move_standard(s16 steepSlopeAngleDegrees) {
     //  This allows numerous glitches and is typically referred to as
     //  deactivation (though this term has a different meaning in the code).
     //  Objects that do this will be marked with //PARTIAL_UPDATE.
-    if (!(o->activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM))) {
+    if (!(o->activeFlags & ACTIVE_FLAG_FAR_AWAY)) {
         if (steepSlopeAngleDegrees < 0) {
             careAboutEdgesAndSteepSlopes = TRUE;
             steepSlopeAngleDegrees = -steepSlopeAngleDegrees;
@@ -2082,7 +2083,9 @@ s32 cur_obj_set_hitbox_and_die_if_attacked(struct ObjectHitbox *hitbox, s32 deat
                     gMarioState->DeadRexes ++;
                 }
                 spawn_mist_particles();
-                obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
+                if (!cur_obj_drop_imbued_object(MB64_STAR_HEIGHT)) {
+                    obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
+                }
                 //gMarioState->EA_LEFT --;
                 //gMarioState->EA_ACTIVE --;
                 obj_mark_for_deletion(o);
@@ -2557,7 +2560,24 @@ struct Surface * cur_obj_get_interact_floor(u8 move_standard_or_object_step) {
     return NULL;
 }
 
+void obj_drop_mario(void) {
+    o->oInteractStatus &= ~INT_STATUS_GRABBED_MARIO;
+    if (o->prevObj) {
+        o->prevObj = NULL;
+        gMarioObject->oInteractStatus |= INT_STATUS_MARIO_THROWN_BY_OBJ | INT_STATUS_MARIO_DROPPED_BY_OBJ;
+    }
+}
+
 void arbritrary_death_coin_release(void) {
+    if (cur_obj_has_behavior(bhvBobomb)) {
+        bobomb_spawn_coin(FALSE);
+        cur_obj_trigger_respawner();
+        return;
+    }
+
+    if (cur_obj_drop_imbued_object(MB64_STAR_HEIGHT)) {
+        return;
+    }
     // If toby fox can get away with the entire undertale dialog system being stored in a single switch statement, i can get
     // away with one teeny hardcoded elseif
     if (cur_obj_has_behavior(bhvMotos)) {
@@ -2566,23 +2586,10 @@ void arbritrary_death_coin_release(void) {
         coin->oForwardVel = 10.0f;
         coin->oVelY = 20.0f;
         coin->oMoveAngleYaw = (f32)(o->oFaceAngleYaw + 0x8000) + random_float() * 1024.0f;
-
-        // drop mario if he's held
-        if (o->prevObj) {
-            o->prevObj = NULL;
-            o->oInteractStatus &= ~INT_STATUS_GRABBED_MARIO;
-            gMarioObject->oInteractStatus |= INT_STATUS_MARIO_THROWN_BY_OBJ | INT_STATUS_MARIO_DROPPED_BY_OBJ;
-        }
+        obj_drop_mario();
     } else if (cur_obj_has_behavior(bhvChuckya)) {
-        // drop mario if he's held
-        if (o->prevObj) {
-            o->prevObj = NULL;
-            o->oInteractStatus &= ~INT_STATUS_GRABBED_MARIO;
-            gMarioObject->oInteractStatus |= INT_STATUS_MARIO_THROWN_BY_OBJ | INT_STATUS_MARIO_DROPPED_BY_OBJ;
-            obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
-        }
-    } else if (cur_obj_has_behavior(bhvBobomb)) {
-        obj_spawn_yellow_coins(o, 1);
+        obj_drop_mario();
+        obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
     } else if (cur_obj_has_behavior(bhvSmallBully)) {
         obj_spawn_yellow_coins(o, 1);
     } else if (cur_obj_has_behavior(bhvScaredKoopa)) {
@@ -2591,10 +2598,6 @@ void arbritrary_death_coin_release(void) {
         coin->oForwardVel = 10.0f;
         coin->oVelY = 20.0f;
         coin->oMoveAngleYaw = (f32)(o->oFaceAngleYaw + 0x8000) + random_float() * 1024.0f;
-    } else if (cur_obj_has_behavior(bhvBigBully)) {
-        cur_obj_drop_imbued_object(400);
-    } else if (cur_obj_has_behavior(bhvMoneybag)||cur_obj_has_behavior(bhvMoneybagHidden)) {
-        obj_spawn_yellow_coins(o, 3);
     } else {
         // default
         obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
@@ -2704,6 +2707,7 @@ s32 is_cur_obj_interact_with_lava(u8 move_standard_or_object_step) {
 }
 
 void cur_obj_interact_with_moving_platform(void) {
+    if (o->activeFlags & ACTIVE_FLAG_FAR_AWAY) return;
     o->oPosX += sInteractFloor->object->oDisplaceVec[0];
     o->oPosZ += sInteractFloor->object->oDisplaceVec[2];
 
@@ -2720,6 +2724,10 @@ void cur_obj_interact_with_moving_platform(void) {
 		}
         o->oPosX += sins(currentAngle) * 10.76f;
         o->oPosZ += coss(currentAngle) * 10.76f;
+    } else if (sInteractFloor->object->behavior == segmented_to_virtual(bhvWoodPlatCol)) {
+        if (o->oFlags & OBJ_FLAG_ACTIVATES_FLOOR_SWITCH) {
+            sInteractFloor->object->prevObj->oVelY -= 1.f;
+        }
     }
 }
 
@@ -2736,6 +2744,26 @@ void cur_obj_floor_interactions(u8 move_standard_or_object_step) {
     cur_obj_interact_with_moving_platform();
 }
 
+void cur_obj_set_home_if_safe_held(void) {
+    // Check if Mario is grounded
+    if (gMarioState->action & ACT_FLAG_AIR) return;
+    if (o->oImbue == IMBUE_STAR) return;
+
+    vec3_copy(&o->oHomeVec, gMarioState->pos);
+}
+
+// less strict version for an object that has just been thrown (chuckya/bobomb)
+void cur_obj_set_home_if_safe_landed(void) {
+    cur_obj_update_floor();
+
+    if (!o->oFloor) return;
+    if (o->oFloorHeight < o->oPosY - 10.f) return;
+    if (o->oFloorType == SURFACE_DEATH_PLANE) return;
+    if (o->oImbue == IMBUE_STAR) return;
+
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
+}
+
 void cur_obj_set_home_if_safe(void) {
     if (!o->oFloor) return;
     if (o->oFloorHeight < o->oPosY - 10.f) return;
@@ -2749,6 +2777,7 @@ void cur_obj_set_home_if_safe(void) {
 s32 cur_obj_die_if_on_death_barrier(s32 offset) {
     if (o->oFloorType == SURFACE_DEATH_PLANE && o->oPosY < o->oFloorHeight + 100.f) {
         cur_obj_drop_imbued_object(offset);
+        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
         return TRUE;
     }
     return FALSE;
@@ -2762,25 +2791,30 @@ void spawn_mist_at_obj(struct Object *obj) {
     vec3f_copy(&o->oPosVec, oldPos);
 }
 
-void cur_obj_drop_imbued_object(s32 y_offset) {
-    struct Object * dropobj;
-    if (o->oImbue == IMBUE_NONE) return;
+s32 cur_obj_drop_imbued_object(s32 y_offset) {
+    struct Object *dropobj = NULL;
+    if (o->oImbue == IMBUE_NONE) return FALSE;
+
     if (o->oImbue == IMBUE_STAR) {
         struct Surface *ptr;
         f32 ceilY = find_ceil(o->oHomeX,o->oHomeY,o->oHomeZ,&ptr);
         spawn_default_star(o->oHomeX,MIN(o->oHomeY+y_offset, ceilY - 75.f),o->oHomeZ);
-        return;
+        return TRUE;
     }
 
     switch(o->oImbue) {
         case IMBUE_BLUE_COIN:
+        case IMBUE_ONE_COIN:
             cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT);
-            dropobj = spawn_object(o, MODEL_BLUE_COIN, bhvBlueCoinMotos);
+            if (o->oImbue == IMBUE_ONE_COIN) {
+                dropobj = spawn_object(o, MODEL_YELLOW_COIN, bhvMovingYellowCoin);
+            } else {
+                dropobj = spawn_object(o, MODEL_BLUE_COIN, bhvBlueCoinMotos);
+            }
             vec3f_copy(&dropobj->oPosVec,&o->oPosVec);
-            dropobj->oForwardVel = 10.0f;
-            dropobj->oVelY = 20.0f;
-            s16 angle = obj_angle_to_object(o, gMarioObject);
-            dropobj->oMoveAngleYaw = angle + random_float() * 1024.0f;
+            dropobj->oForwardVel = 3.f;
+            dropobj->oVelY = 30.f;
+            dropobj->oMoveAngleYaw = random_u16();
             break;
         case IMBUE_THREE_COINS:
             obj_spawn_yellow_coins(o, 3);
@@ -2805,7 +2839,12 @@ void cur_obj_drop_imbued_object(s32 y_offset) {
             spawn_mist_at_obj(dropobj);
             break;
     }
+    if (dropobj) {
+        dropobj->oFaceAnglePitch = 0;
+        dropobj->oFaceAngleRoll = 0;
+    }
     o->oImbue = IMBUE_NONE;
+    return TRUE;
 }
 
 

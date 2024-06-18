@@ -36,7 +36,7 @@ void bhv_blue_coin_jumping_loop(void); /* likely unused */
 void bhv_seaweed_init(void);
 void bhv_seaweed_bundle_init(void);
 void bhv_bobomb_init(void);
-void bobomb_spawn_coin(void);
+void bobomb_spawn_coin(s32 lava);
 void bobomb_act_explode(void);
 void bobomb_check_interactions(void);
 void bobomb_act_patrol(void);
@@ -156,6 +156,7 @@ void moneybag_act_return_home(void);
 void moneybag_act_disappear(void);
 void moneybag_act_death(void);
 void bhv_moneybag_loop(void);
+void bhv_moneybag_hidden_init(void);
 void bhv_moneybag_hidden_loop(void);
 void bhv_bowling_ball_init(void);
 void bowling_ball_set_hitbox(void);

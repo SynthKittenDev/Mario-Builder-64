@@ -314,9 +314,15 @@ void df_grindel(s32 context) {
     }
 }
 
+void df_hammerbro(s32 context) {
+    if (context == MB64_DF_CONTEXT_INIT) {
+        o->oPosY += 60.f;
+    }
+}
 void df_firebro(s32 context) {
     if (context == MB64_DF_CONTEXT_INIT) {
         o->oAnimState = 1;
+        o->oPosY += 60.f;
     }
 }
 
@@ -337,10 +343,6 @@ void df_pokey(s32 context) {
             o->oPosY += 120.0f;
         }
     }
-}
-
-void df_hammerbro(s32 context) {
-    // stub, will leave it here if i need it again ever
 }
 
 void df_wiggler(s32 context) {
@@ -374,18 +376,12 @@ void df_timedbox(s32 context) {
 void df_button(s32 context) {
     if (context == MB64_DF_CONTEXT_INIT) {
         o->oAnimState = o->oBehParams2ndByte;
-        if (o->oBehParams2ndByte == 0) {
-            o->header.gfx.scale[1] = 0.1f;
-        }
     }
 }
 
 void df_block(s32 context) {
     if (context == MB64_DF_CONTEXT_INIT) {
         o->oAnimState = o->oBehParams2ndByte;
-        if (o->oBehParams2ndByte == 1) {
-            o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MAKER_BLOCK_OFF];
-        }
     }
 }
 

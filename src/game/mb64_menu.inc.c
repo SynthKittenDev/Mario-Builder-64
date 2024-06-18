@@ -542,12 +542,20 @@ void mb64_set_data_overrides(void) {
 #define SCROLL_SETTINGS 14
 #define MB64_SETTINGS_MENU_IS_STILL  ((mb64_menu_scrolling[SCROLL_SETTINGS][0] == 0) && (mb64_menu_start_timer == -1))
 
+void draw_num_coins(f32 x, f32 y) {
+    char buf[50];
+    sprintf(buf, "Total Coins: %d", mb64_total_coin_count);
+    print_maker_string_ascii_centered(x, y, buf, 0);
+}
+
 void draw_mb64_settings_misc(f32 xoff, f32 yoff) {
     animate_list_update(mb64_menu_list_offsets, ARRAY_COUNT(mb64_settings_misc_buttons), mb64_menu_index);
     for (s32 i=0;i<ARRAY_COUNT(mb64_settings_misc_buttons);i++) {
         print_maker_string_ascii( 55 +xoff+3*mb64_menu_list_offsets[i],154-(i*16)+yoff,mb64_settings_misc_buttons[i].str,(i==mb64_menu_index));
         mb64_menu_option_animation(200+xoff+3*mb64_menu_list_offsets[i],154-(i*16)+yoff,60,&mb64_settings_misc_buttons[i],i,mb64_joystick);
     }
+
+    draw_num_coins(160+xoff, 95+yoff);
 }
 
 void draw_mb64_settings_misc_vanilla(f32 xoff, f32 yoff) {
@@ -556,6 +564,8 @@ void draw_mb64_settings_misc_vanilla(f32 xoff, f32 yoff) {
         print_maker_string_ascii(55+xoff+3*mb64_menu_list_offsets[i],154-(i*16)+yoff,mb64_settings_misc_buttons_vanilla[i].str,(i==mb64_menu_index));
         mb64_menu_option_animation(200+xoff+3*mb64_menu_list_offsets[i],154-(i*16)+yoff,60,&mb64_settings_misc_buttons_vanilla[i],i,mb64_joystick);
     }
+
+    draw_num_coins(160+xoff, 95+yoff);
 }
 
 void draw_mb64_settings_boundary(f32 xoff, f32 yoff) {
@@ -938,9 +948,15 @@ void draw_mb64_settings_system(f32 xoff, f32 yoff) {
     }
     
     int vtx_perc = ((f32)mb64_vtx_total/(f32)MB64_VTX_SIZE)*100.0f;
-    int tile_perc = ((f32)mb64_tile_count/10000.0f)*100.0f;
-    sprintf(strbuf,"Verts: %d%% Tiles: %d%%",vtx_perc,tile_perc);
-    print_maker_string_ascii_centered(160+xoff+3*mb64_menu_list_offsets[2], 100+yoff,strbuf,MB64_TEXT_WHITE);
+    int tile_perc = ((f32)mb64_tile_count/(f32)MB64_TILE_POOL_SIZE)*100.0f;
+    int obj_perc = ((f32)mb64_object_limit_count/(f32)MB64_MAX_OBJS)*100.0f;
+    sprintf(strbuf,"Vertices: %d/50k (%d%%)",mb64_vtx_total, vtx_perc);
+    print_maker_string_ascii(20+xoff+3*mb64_menu_list_offsets[2], 110+yoff,strbuf,MB64_TEXT_WHITE);
+    sprintf(strbuf,"Tiles:    %d/15k (%d%%)",mb64_tile_count, tile_perc);
+    print_maker_string_ascii(20+xoff+3*mb64_menu_list_offsets[2], 95+yoff,strbuf,MB64_TEXT_WHITE);
+
+    sprintf(strbuf,"Objs:  %d/512 (%d%%)",mb64_object_limit_count, obj_perc);
+    print_maker_string_ascii(305+xoff+3*mb64_menu_list_offsets[2]-get_string_width_ascii(strbuf), 95+yoff,strbuf,MB64_TEXT_WHITE);
 
     if ((gPlayer1Controller->buttonPressed & A_BUTTON) && MB64_SETTINGS_MENU_IS_STILL) {
         switch (mb64_menu_index) {
@@ -1578,7 +1594,7 @@ void mb64_mm_generic_anim_check(s32 canBack) {
 void mb64_mm_files_anim_check(s32 canBack) {
     if (gPlayer1Controller->buttonPressed & (A_BUTTON)) {
         if (mb64_level_entry_count == 0) return;
-        if (mb64_level_entry_version[mb64_menu_index] > MB64_VERSION) {
+        if (mb64_level_entry_version[mb64_mm_page * PAGE_SIZE+mb64_menu_index] > MB64_VERSION) {
             play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
             return;
         }

@@ -18,11 +18,18 @@ void bhv_bobomb_init(void) {
     o->oBuoyancy = 1.3f;
     o->oInteractionSubtype = INT_SUBTYPE_KICKABLE;
     o->oQuicksandDepthToDie = 55;
+    create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, MB64_RESPAWN_DIST);
 }
 
-void bobomb_spawn_coin(void) {
+void bobomb_spawn_coin(s32 lava) {
     if (!(GET_BPARAM3(o->oBehParams) & RESPAWN_INFO_TYPE_NORMAL)) {
-        obj_spawn_yellow_coins(o, 1);
+        if (!cur_obj_drop_imbued_object(MB64_STAR_HEIGHT)) {
+            if (lava) {
+                bully_spawn_coin();
+            } else {
+                obj_spawn_yellow_coins(o, 1);
+            }
+        }
         SET_FULL_BPARAM3(o->oBehParams, RESPAWN_INFO_TYPE_NORMAL);
         set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_NORMAL);
     }
@@ -32,11 +39,13 @@ void bobomb_act_explode(void) {
     if (o->oTimer < 5) {
         cur_obj_scale(1.0f + ((f32) o->oTimer / 5.0f));
     } else {
+        cur_obj_set_home_if_safe_landed();
+
         struct Object *explosion = spawn_object(o, MODEL_EXPLOSION, bhvExplosion);
         explosion->oGraphYOffset += 100.0f;
 
-        bobomb_spawn_coin();
-        create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, MB64_DRAWDIST_LOW);
+        bobomb_spawn_coin(FALSE);
+        cur_obj_trigger_respawner();
 
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
@@ -70,6 +79,7 @@ void bobomb_check_interactions(void) {
 void bobomb_act_patrol(void) {
     o->oForwardVel = 5.0f;
 
+    cur_obj_set_home_if_safe();
     s16 collisionFlags = object_step();
     o->oMoveAngleYaw += 320;
     if ((o->oDistanceToMario < 400.f) && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x2000)) {
@@ -83,6 +93,7 @@ void bobomb_act_patrol(void) {
 void bobomb_act_chase_mario(void) {
     s16 animFrame = ++o->header.gfx.animInfo.animFrame;
 
+    cur_obj_set_home_if_safe();
     o->oForwardVel = 20.0f;
     s16 collisionFlags = object_step();
 
@@ -96,7 +107,7 @@ void bobomb_act_chase_mario(void) {
 
 void bobomb_act_launched(void) {
     s16 collisionFlags = object_step();
-    if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) {
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         o->oAction = BOBOMB_ACT_EXPLODE;
     }
 }
@@ -121,46 +132,14 @@ void generic_bobomb_free_loop(void) {
 
         case OBJ_ACT_LAVA_DEATH:
             if (obj_lava_death()) {
-                create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, MB64_DRAWDIST_LOW);
+                bobomb_spawn_coin(TRUE);
+                cur_obj_trigger_respawner();
             }
             break;
 
         case OBJ_ACT_DEATH_PLANE_DEATH:
             o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-            create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, MB64_DRAWDIST_LOW);
-            break;
-    }
-
-    bobomb_check_interactions();
-
-    if (gMarioState->_2D) {
-        o->oPosZ = 0.0f;
-    }
-
-    if (o->oBobombFuseTimer > 150) {
-        o->oAction = 3;
-    }
-}
-
-void stationary_bobomb_free_loop(void) {
-    switch (o->oAction) {
-        case BOBOMB_ACT_LAUNCHED:
-            bobomb_act_launched();
-            break;
-
-        case BOBOMB_ACT_EXPLODE:
-            bobomb_act_explode();
-            break;
-
-        case OBJ_ACT_LAVA_DEATH:
-            if (obj_lava_death()) {
-                create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, MB64_DRAWDIST_LOW);
-            }
-            break;
-
-        case OBJ_ACT_DEATH_PLANE_DEATH:
-            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-            create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, MB64_DRAWDIST_LOW);
+            cur_obj_trigger_respawner();
             break;
     }
 
@@ -179,6 +158,7 @@ void bobomb_held_loop(void) {
     o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
     cur_obj_init_animation(BOBOMB_ANIM_HELD);
     cur_obj_set_pos_relative(gMarioObject, 0.0f, 60.0f, 100.0f);
+    cur_obj_set_home_if_safe_held();
 
     o->oBobombFuseLit = TRUE;
     if (o->oBobombFuseTimer > 150) {
@@ -238,25 +218,25 @@ void curr_obj_random_blink(s32 *blinkTimer) {
 void bhv_bobomb_loop(void) {
     s8 dustPeriodMinus1;
 
+    switch (o->oHeldState) {
+        case HELD_FREE:
+            bobomb_free_loop();
+            break;
+
+        case HELD_HELD:
+            bobomb_held_loop();
+            break;
+
+        case HELD_THROWN:
+            bobomb_thrown_loop();
+            break;
+
+        case HELD_DROPPED:
+            bobomb_dropped_loop();
+            break;
+    }
+
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, o->oDrawingDistance)) {
-        switch (o->oHeldState) {
-            case HELD_FREE:
-                bobomb_free_loop();
-                break;
-
-            case HELD_HELD:
-                bobomb_held_loop();
-                break;
-
-            case HELD_THROWN:
-                bobomb_thrown_loop();
-                break;
-
-            case HELD_DROPPED:
-                bobomb_dropped_loop();
-                break;
-        }
-
         curr_obj_random_blink(&o->oBobombBlinkTimer);
 
         if (o->oBobombFuseLit) {
